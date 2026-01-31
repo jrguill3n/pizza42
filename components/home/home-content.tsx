@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ChevronRight,
   Sparkles,
@@ -25,6 +26,7 @@ interface HomeContentProps {
 
 export function HomeContent({ user, ordersContext }: HomeContentProps) {
   const { addItem } = useCart();
+  const router = useRouter();
 
   const isAuthenticated = !!user;
   const hasOrders = ordersContext && ordersContext.orders_count > 0;
@@ -41,6 +43,8 @@ export function HomeContent({ user, ordersContext }: HomeContentProps) {
     toast.success("Added to cart", {
       description: "Your last order is ready to checkout",
     });
+    // Navigate to order page so user can review and checkout
+    router.push("/order");
   };
 
   return (

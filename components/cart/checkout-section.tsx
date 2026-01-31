@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AlertCircle, Loader2, Mail, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart, useAuth } from "@/components/providers/app-provider";
-import { placeOrderMock } from "@/lib/mock-data";
+import { placeOrder } from "@/lib/api-client";
 import { toast } from "sonner";
 
 interface CheckoutSectionProps {
@@ -18,17 +18,33 @@ export function CheckoutSection({ onClose }: CheckoutSectionProps) {
 
   const isAuthenticated = session.isAuthenticated;
   const isVerified = session.user?.email_verified ?? false;
-  const canCheckout = isAuthenticated && isVerified && items.length > 0;
+  const canCheckout = isAuthenticated && items.length > 0;
 
   const handlePlaceOrder = async () => {
-    if (!canCheckout) return;
+    if (!isAuthenticated || items.length === 0) return;
 
     setIsPlacing(true);
     try {
-      const order = await placeOrderMock(items);
+      const result = await placeOrder(items);
+      
+      if (!result.success) {
+        // Handle email_not_verified error from server
+        if (result.code === "email_not_verified") {
+          toast.error("Email verification required", {
+            description: "Please verify your email before placing orders",
+          });
+          return;
+        }
+        
+        toast.error("Something went wrong", {
+          description: result.error,
+        });
+        return;
+      }
+      
       clearCart();
       toast.success("Order placed!", {
-        description: `Order #${order.id.slice(-6)} is being prepared`,
+        description: `Order #${result.order.id.slice(-6)} is being prepared`,
       });
       onClose?.();
     } catch {
