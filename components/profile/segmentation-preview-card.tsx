@@ -1,14 +1,14 @@
-"use client";
-
 import { Users, TrendingUp } from "lucide-react";
-import { useAuth } from "@/components/providers/app-provider";
 import { getSegmentationMock } from "@/lib/mock-data";
+import type { OrdersContext } from "@/lib/auth0";
 
-export function SegmentationPreviewCard() {
-  const { session } = useAuth();
+interface SegmentationPreviewCardProps {
+  ordersContext: OrdersContext | null;
+}
 
-  const ordersCount = session.user?.orders_context.orders_count ?? 0;
-  const lastOrderAt = session.user?.orders_context.last_order_at ?? null;
+export function SegmentationPreviewCard({ ordersContext }: SegmentationPreviewCardProps) {
+  const ordersCount = ordersContext?.orders_count ?? 0;
+  const lastOrderAt = ordersContext?.last_order_at ?? null;
 
   const { segment, reasoning } = getSegmentationMock(ordersCount, lastOrderAt);
 

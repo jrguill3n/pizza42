@@ -1,20 +1,28 @@
 "use client";
 
+import Link from "next/link";
 import { RefreshCw, Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/components/providers/app-provider";
-import { getTokenClaimsMock } from "@/lib/mock-data";
-import { toast } from "sonner";
+import type { Auth0User, OrdersContext } from "@/lib/auth0";
+import { ORDERS_CONTEXT_CLAIM, getLoginUrl } from "@/lib/auth0";
 
-export function TokenClaimsViewer() {
-  const { session, login } = useAuth();
-  const claims = getTokenClaimsMock(session.user);
+interface TokenClaimsViewerProps {
+  user: Auth0User | null;
+  ordersContext: OrdersContext | null;
+}
 
-  const handleReLogin = () => {
-    login();
-    toast.info("Session refreshed", {
-      description: "Token claims have been updated",
-    });
+export function TokenClaimsViewer({ user, ordersContext }: TokenClaimsViewerProps) {
+  if (!user) return null;
+
+  // Build claims object for display
+  const claims = {
+    sub: user.sub,
+    email: user.email,
+    email_verified: user.email_verified,
+    [ORDERS_CONTEXT_CLAIM]: ordersContext ?? undefined,
+    // Add any other standard claims
+    ...(user.name && { name: user.name }),
+    ...(user.picture && { picture: user.picture }),
   };
 
   return (
@@ -37,12 +45,14 @@ export function TokenClaimsViewer() {
       </p>
 
       <Button
-        onClick={handleReLogin}
+        asChild
         variant="outline"
         className="w-full border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-neon bg-transparent"
       >
-        <RefreshCw className="w-4 h-4 mr-2" />
-        Re-login to refresh claims
+        <Link href={getLoginUrl("/profile")}>
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Re-login to refresh claims
+        </Link>
       </Button>
     </div>
   );
