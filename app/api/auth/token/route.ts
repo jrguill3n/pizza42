@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { getSession, getAccessToken } from "@auth0/nextjs-auth0";
+import { getSession, getAccessToken } from "@auth0/nextjs-auth0/server";
+
+export const runtime = "nodejs";
 
 /**
  * GET /api/auth/token
