@@ -8,7 +8,7 @@ import { TokenClaimsViewer } from "@/components/profile/token-claims-viewer";
 import { SegmentationPreviewCard } from "@/components/profile/segmentation-preview-card";
 import { PasskeysRoadmapCallout } from "@/components/profile/passkeys-roadmap-callout";
 import type { Auth0User, OrdersContext } from "@/lib/auth0";
-import { getLoginUrl, getLogoutUrl } from "@/lib/auth0";
+import { getLoginUrl, getLogoutUrl, getSignupUrl } from "@/lib/auth0";
 
 interface ProfileContentProps {
   user: Auth0User | null;
@@ -35,14 +35,14 @@ export function ProfileContent({ user, ordersContext }: ProfileContentProps) {
               asChild
               className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle"
             >
-              <Link href={getLoginUrl("/profile")}>Log in</Link>
+              <a href={getLoginUrl("/profile")}>Log in</a>
             </Button>
             <Button
               asChild
               variant="outline"
               className="border-primary/40 text-primary hover:bg-primary hover:text-primary-foreground bg-transparent"
             >
-              <Link href={getLoginUrl("/profile")}>Create account</Link>
+              <a href={getSignupUrl("/profile")}>Create account</a>
             </Button>
           </div>
         </div>
@@ -134,10 +134,10 @@ export function ProfileContent({ user, ordersContext }: ProfileContentProps) {
               variant="outline"
               className="w-full border-destructive/50 text-destructive hover:bg-destructive hover:text-destructive-foreground bg-transparent"
             >
-              <Link href={getLogoutUrl("/")}>
+              <a href={getLogoutUrl("/")}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Log out
-              </Link>
+              </a>
             </Button>
           </div>
 

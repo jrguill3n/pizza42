@@ -83,14 +83,14 @@ export function HomeContent({ user, ordersContext }: HomeContentProps) {
                   asChild
                   className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle h-12 px-6 font-semibold text-base active-scale"
                 >
-                  <Link href={getLoginUrl("/")}>Log in</Link>
+                  <a href={getLoginUrl("/")}>Log in</a>
                 </Button>
                 <Button
                   asChild
                   variant="outline"
                   className="border-primary/40 text-primary hover:bg-primary hover:text-primary-foreground h-12 px-6 font-semibold text-base bg-transparent active-scale"
                 >
-                  <Link href={getSignupUrl("/")}>Create account</Link>
+                  <a href={getSignupUrl("/")}>Create account</a>
                 </Button>
               </div>
               <p className="text-sm text-muted-foreground flex items-center gap-2">
@@ -121,7 +121,7 @@ export function HomeContent({ user, ordersContext }: HomeContentProps) {
                 size="sm"
                 className="text-muted-foreground hover:text-foreground"
               >
-                <Link href={getLogoutUrl("/")}>Log out</Link>
+                <a href={getLogoutUrl("/")}>Log out</a>
               </Button>
             </div>
           )}
