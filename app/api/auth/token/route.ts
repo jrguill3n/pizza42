@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getAccessToken, getSession } from "@auth0/nextjs-auth0";
+import { getAccessToken } from "@auth0/nextjs-auth0";
 
 /**
  * GET /api/auth/token
@@ -7,37 +7,21 @@ import { getAccessToken, getSession } from "@auth0/nextjs-auth0";
  */
 export async function GET(req: NextRequest) {
   try {
-    // Check if user has a session first
-    const session = await getSession();
-    if (!session || !session.user) {
-      return NextResponse.json(
-        { error: "unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    // Get access token with required scopes and audience
-    const result = await getAccessToken({
+    const res = NextResponse.next();
+    const { accessToken } = await getAccessToken(req, res, {
       scopes: ["read:orders", "create:orders"],
       authorizationParams: {
         audience: process.env.AUTH0_AUDIENCE,
       },
     });
 
-    if (!result || !result.accessToken) {
-      return NextResponse.json(
-        { error: "unauthorized" },
-        { status: 401 }
-      );
+    if (!accessToken) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
 
-    return NextResponse.json({ accessToken: result.accessToken });
+    return NextResponse.json({ accessToken });
   } catch (error) {
-    // User not authenticated or token retrieval failed
     console.error("[v0] Token retrieval error:", error);
-    return NextResponse.json(
-      { error: "unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 }
