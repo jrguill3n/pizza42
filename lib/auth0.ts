@@ -1,4 +1,7 @@
-import { getSession, type Claims } from "@auth0/nextjs-auth0";
+import { Auth0Client } from "@auth0/nextjs-auth0/server";
+
+// Create Auth0 client instance
+export const auth0 = new Auth0Client();
 
 // Custom claim namespace for orders context
 export const ORDERS_CONTEXT_CLAIM = "https://pizza42.example/orders_context";
@@ -19,10 +22,12 @@ export interface OrdersContext {
   } | null;
 }
 
-export interface Auth0User extends Claims {
+export interface Auth0User {
   email: string;
   email_verified: boolean;
   sub: string;
+  name?: string;
+  picture?: string;
   [ORDERS_CONTEXT_CLAIM]?: OrdersContext;
 }
 
@@ -30,7 +35,7 @@ export interface Auth0User extends Claims {
  * Get the current session including user (server-side only)
  */
 export async function getAuth0Session() {
-  const session = await getSession();
+  const session = await auth0.getSession();
   return session;
 }
 
@@ -38,7 +43,7 @@ export async function getAuth0Session() {
  * Get the current authenticated user from the session (server-side only)
  */
 export async function getSessionUserServer(): Promise<Auth0User | null> {
-  const session = await getSession();
+  const session = await auth0.getSession();
   return (session?.user as Auth0User) ?? null;
 }
 
