@@ -14,15 +14,11 @@ interface TokenClaimsViewerProps {
 export function TokenClaimsViewer({ user, ordersContext }: TokenClaimsViewerProps) {
   if (!user) return null;
 
-  // Build claims object for display
+  // Build filtered claims object - only show relevant fields
   const claims = {
-    sub: user.sub,
     email: user.email,
     email_verified: user.email_verified,
-    [ORDERS_CONTEXT_CLAIM]: ordersContext ?? undefined,
-    // Add any other standard claims
-    ...(user.name && { name: user.name }),
-    ...(user.picture && { picture: user.picture }),
+    [ORDERS_CONTEXT_CLAIM]: ordersContext ?? null,
   };
 
   return (
