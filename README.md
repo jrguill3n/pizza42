@@ -14,14 +14,14 @@ A demo pizza ordering app showcasing Auth0 integration patterns for identity-dri
 ## Local Setup
 
 1. Clone the repository and install dependencies:
-   ```bash
+   \`\`\`bash
    npm install
-   ```
+   \`\`\`
 
 2. Copy `.env.example` to `.env.local` and fill in your Auth0 credentials:
-   ```bash
+   \`\`\`bash
    cp .env.example .env.local
-   ```
+   \`\`\`
 
 3. Configure Auth0:
    - Create an Auth0 Application (Regular Web Application)
@@ -32,7 +32,7 @@ A demo pizza ordering app showcasing Auth0 integration patterns for identity-dri
    - Create a Machine-to-Machine app for Management API access
 
 4. Add an Auth0 Action (Login flow) to enrich tokens with order context:
-   ```javascript
+   \`\`\`javascript
    exports.onExecutePostLogin = async (event, api) => {
      const namespace = 'https://pizza42.example';
      const metadata = event.user.user_metadata || {};
@@ -43,12 +43,12 @@ A demo pizza ordering app showcasing Auth0 integration patterns for identity-dri
        last_order: metadata.last_order || null
      });
    };
-   ```
+   \`\`\`
 
 5. Run the development server:
-   ```bash
+   \`\`\`bash
    npm run dev
-   ```
+   \`\`\`
 
 ## Required Environment Variables
 
@@ -90,7 +90,7 @@ A demo pizza ordering app showcasing Auth0 integration patterns for identity-dri
 
 ## Architecture
 
-```
+\`\`\`
 /app
   /auth/[auth0]     → Auth0 route handler (login, logout, callback)
   /api/auth/token   → Returns access token for API calls
@@ -103,7 +103,7 @@ A demo pizza ordering app showcasing Auth0 integration patterns for identity-dri
   /auth.ts          → JWT verification with JWKS
   /mgmt.ts          → Auth0 Management API client
   /api-client.ts    → Client-side API utilities
-```
+\`\`\`
 
 ## License
 
