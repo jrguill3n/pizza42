@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSession, getAccessToken } from "@auth0/nextjs-auth0/server";
+import { auth0 } from "@/lib/auth0";
 
 export const runtime = "nodejs";
 
@@ -9,26 +9,19 @@ export const runtime = "nodejs";
  */
 export async function GET() {
   try {
-    // Check session first
-    const session = await getSession();
+    const session = await auth0.getSession();
     
-    if (!session || !session.user) {
+    if (!session) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
 
-    // Get access token with required scopes and audience
-    const result = await getAccessToken({
-      scopes: ["read:orders", "create:orders"],
-      authorizationParams: {
-        audience: process.env.AUTH0_AUDIENCE || "",
-      },
-    });
-
-    if (!result || !result.accessToken) {
+    const { token } = await auth0.getAccessToken();
+    
+    if (!token) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
 
-    return NextResponse.json({ accessToken: result.accessToken });
+    return NextResponse.json({ accessToken: token });
   } catch (error) {
     console.error("[v0] Token retrieval error:", error);
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });

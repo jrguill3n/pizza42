@@ -1,3 +1,13 @@
+import { Auth0Client } from "@auth0/nextjs-auth0/server";
+
+// Create Auth0 client singleton with configuration
+export const auth0 = new Auth0Client({
+  authorizationParameters: {
+    audience: process.env.AUTH0_AUDIENCE,
+    scope: "openid profile email read:orders create:orders",
+  },
+});
+
 // Custom claim namespace for orders context
 export const ORDERS_CONTEXT_CLAIM = "https://pizza42.example/orders_context";
 
@@ -26,47 +36,18 @@ export interface Auth0User {
   [ORDERS_CONTEXT_CLAIM]?: OrdersContext;
 }
 
-// Demo user for preview - toggle this to test different states
-// Set to null to test logged-out state
-const DEMO_USER: Auth0User | null = {
-  email: "demo@pizza42.example",
-  email_verified: true,
-  sub: "auth0|demo123",
-  name: "Demo User",
-  [ORDERS_CONTEXT_CLAIM]: {
-    orders_count: 5,
-    last_order_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    last_order: {
-      id: "order_abc123",
-      items: [
-        { id: "margherita", name: "Margherita", price: 14.99, quantity: 1, category: "pizza" },
-        { id: "pepperoni", name: "Pepperoni", price: 16.99, quantity: 1, category: "pizza" },
-        { id: "garlic-bread", name: "Garlic Bread", price: 5.99, quantity: 2, category: "sides" },
-      ],
-      total: 43.96,
-    },
-  },
-};
-
 /**
  * Get the current session including user (server-side only)
- * In production, this would use Auth0Client.getSession()
- * For v0 preview, returns demo data
  */
 export async function getAuth0Session() {
-  // In v0 preview environment, return demo session
-  // When deployed with Auth0 configured, replace with real Auth0Client
-  if (DEMO_USER) {
-    return { user: DEMO_USER };
-  }
-  return null;
+  return await auth0.getSession();
 }
 
 /**
  * Get the current authenticated user from the session (server-side only)
  */
 export async function getSessionUserServer(): Promise<Auth0User | null> {
-  const session = await getAuth0Session();
+  const session = await auth0.getSession();
   return (session?.user as Auth0User) ?? null;
 }
 
