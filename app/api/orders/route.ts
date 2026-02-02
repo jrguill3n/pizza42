@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { auth0 } from "@/lib/auth0";
-import { getAccessTokenForRequest } from "@/lib/getAccessTokenForRequest";
 import * as jose from "jose";
+import { auth0 } from "@/lib/auth0";
+import { getUser, updateUserMetadata } from "@/lib/auth0Management";
 
 export const runtime = "nodejs";
 
@@ -21,119 +21,127 @@ interface Order {
   total: number;
 }
 
+// Cache JWKS for performance
+let jwksCache: jose.JWTVerifyGetKey | null = null;
+
+async function getJWKS(): Promise<jose.JWTVerifyGetKey> {
+  if (!jwksCache) {
+    const issuer = process.env.AUTH0_ISSUER_BASE_URL!;
+    // Ensure trailing slash
+    const issuerUrl = issuer.endsWith("/") ? issuer : `${issuer}/`;
+    const jwksUrl = new URL(".well-known/jwks.json", issuerUrl);
+    jwksCache = jose.createRemoteJWKSet(jwksUrl);
+  }
+  return jwksCache;
+}
+
+async function verifyToken(token: string) {
+  const issuer = process.env.AUTH0_ISSUER_BASE_URL!;
+  const issuerUrl = issuer.endsWith("/") ? issuer : `${issuer}/`;
+  const audience = process.env.AUTH0_AUDIENCE!;
+  const JWKS = await getJWKS();
+
+  const { payload } = await jose.jwtVerify(token, JWKS, {
+    issuer: issuerUrl,
+    audience: audience,
+  });
+
+  return payload;
+}
+
+function checkPermission(payload: any, required: string): boolean {
+  // Check permissions array (RBAC)
+  if (payload.permissions?.includes(required)) {
+    return true;
+  }
+  // Check scope string (traditional OAuth)
+  if (payload.scope?.split(" ").includes(required)) {
+    return true;
+  }
+  return false;
+}
+
 /**
  * GET /api/orders
  * Returns user's orders
- * Requires scope: read:orders
+ * Requires permission: read:orders
  */
 export async function GET(request: Request) {
-  // Check session first
-  const session = await auth0.getSession();
-  
-  if (!session || !session.user) {
-    console.log("[v0] GET /api/orders: No session found");
+  // Extract Authorization header
+  const authHeader = request.headers.get("authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const userId = session.user.sub as string;
+  const token = authHeader.substring(7);
 
-  // Get access token with required scopes
-  let accessToken: string;
-  let tokenResponse: NextResponse | undefined;
-  try {
-    const tokenResult = await getAccessTokenForRequest(request);
-    accessToken = tokenResult.accessToken;
-    tokenResponse = tokenResult.response;
-    console.log("[v0] GET /api/orders: Access token received:", !!accessToken);
-  } catch (error: any) {
-    console.error("[v0] GET /api/orders: Token retrieval failed:", error.message || error);
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  // Decode token to check permissions/scopes
+  // Verify JWT
   let payload: any;
   try {
-    payload = jose.decodeJwt(accessToken);
+    payload = await verifyToken(token);
   } catch (error) {
-    console.error("[v0] GET /api/orders: Token decode failed:", error);
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    console.error("[v0] GET /api/orders: JWT verification failed:", error);
+    return NextResponse.json({ error: "invalid_token" }, { status: 401 });
   }
 
-  // Check permissions array (RBAC) or scope string
-  const hasPermission = payload.permissions?.includes("read:orders");
-  const hasScope = payload.scope?.split(" ").includes("read:orders");
-  
-  if (!hasPermission && !hasScope) {
-    console.log("[v0] GET /api/orders: Missing required scope/permission read:orders");
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  // Check permissions
+  if (!checkPermission(payload, "read:orders")) {
+    return NextResponse.json(
+      { error: "forbidden", missing: "read:orders" },
+      { status: 403 }
+    );
   }
+
+  // Get user ID from token
+  const userId = payload.sub as string;
 
   // Get orders for user
   const orders = ordersStore.get(userId) || [];
-  
-  const jsonResponse = NextResponse.json({ orders, orders_count: orders.length });
-  
-  // Preserve any set-cookie headers from the token response
-  if (tokenResponse) {
-    const cookies = tokenResponse.headers.get("set-cookie");
-    if (cookies) {
-      jsonResponse.headers.set("set-cookie", cookies);
-    }
-  }
-  
-  return jsonResponse;
+
+  return NextResponse.json({ orders });
 }
 
 /**
  * POST /api/orders
  * Creates a new order
- * Requires scope: create:orders
+ * Requires permission: create:orders
  */
 export async function POST(request: Request) {
-  // Check session first
-  const session = await auth0.getSession();
-  
-  if (!session || !session.user) {
-    console.log("[v0] POST /api/orders: No session found");
+  // Extract Authorization header
+  const authHeader = request.headers.get("authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const userId = session.user.sub as string;
+  const token = authHeader.substring(7);
 
-  // Get access token with required scopes
-  let accessToken: string;
-  let tokenResponse: NextResponse | undefined;
-  try {
-    const tokenResult = await getAccessTokenForRequest(request);
-    accessToken = tokenResult.accessToken;
-    tokenResponse = tokenResult.response;
-    console.log("[v0] POST /api/orders: Access token received:", !!accessToken);
-  } catch (error: any) {
-    console.error("[v0] POST /api/orders: Token retrieval failed:", error.message || error);
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  // Decode token to check permissions/scopes
+  // Verify JWT
   let payload: any;
   try {
-    payload = jose.decodeJwt(accessToken);
+    payload = await verifyToken(token);
   } catch (error) {
-    console.error("[v0] POST /api/orders: Token decode failed:", error);
+    console.error("[v0] POST /api/orders: JWT verification failed:", error);
+    return NextResponse.json({ error: "invalid_token" }, { status: 401 });
+  }
+
+  // Check permissions
+  if (!checkPermission(payload, "create:orders")) {
+    return NextResponse.json(
+      { error: "forbidden", missing: "create:orders" },
+      { status: 403 }
+    );
+  }
+
+  // Get user ID from token
+  const userId = payload.sub as string;
+
+  // Verify email is verified (server-side session check)
+  const session = await auth0.getSession();
+  if (!session || !session.user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  // Check permissions array (RBAC) or scope string
-  const hasPermission = payload.permissions?.includes("create:orders");
-  const hasScope = payload.scope?.split(" ").includes("create:orders");
-  
-  if (!hasPermission && !hasScope) {
-    console.log("[v0] POST /api/orders: Missing required scope/permission create:orders");
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
-
-  // Verify email is verified
-  if (!session.user.email_verified) {
-    console.log("[v0] POST /api/orders: Email not verified");
+  if (session.user.email_verified !== true) {
     return NextResponse.json({ error: "email_not_verified" }, { status: 403 });
   }
 
@@ -157,7 +165,7 @@ export async function POST(request: Request) {
   }
 
   // Calculate total
-  const total = body.items.reduce((sum, item) => sum + (item.qty * item.price), 0);
+  const total = body.items.reduce((sum, item) => sum + item.qty * item.price, 0);
 
   // Create order
   const order: Order = {
@@ -167,20 +175,31 @@ export async function POST(request: Request) {
     total,
   };
 
-  // Store order
+  // Store order in memory
   const userOrders = ordersStore.get(userId) || [];
   userOrders.push(order);
   ordersStore.set(userId, userOrders);
 
-  const jsonResponse = NextResponse.json({ order, orders_count: userOrders.length }, { status: 201 });
-  
-  // Preserve any set-cookie headers from the token response
-  if (tokenResponse) {
-    const cookies = tokenResponse.headers.get("set-cookie");
-    if (cookies) {
-      jsonResponse.headers.set("set-cookie", cookies);
-    }
+  // Persist last 5 orders to user_metadata
+  try {
+    const user = await getUser(userId);
+    const existingOrders = (user.user_metadata?.orders as Order[]) || [];
+    
+    // Append new order and keep only last 5
+    const updatedOrders = [...existingOrders, order].slice(-5);
+    
+    await updateUserMetadata(userId, {
+      ...user.user_metadata,
+      orders: updatedOrders,
+    });
+
+    return NextResponse.json(
+      { ok: true, order, saved_orders_count: updatedOrders.length },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("[v0] POST /api/orders: Failed to persist to metadata:", error);
+    // Still return success since order was created
+    return NextResponse.json({ ok: true, order }, { status: 201 });
   }
-  
-  return jsonResponse;
 }
