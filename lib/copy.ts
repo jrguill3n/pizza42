@@ -89,7 +89,7 @@ export const copy = {
     home_date_yesterday: "Ayer",
     
     // Menú
-    menu_add_to_cart: "Agregar al Carrito",
+    menu_add_to_cart: "Agregar",
     
     // Carrito
     cart_title: "Tu Carrito",

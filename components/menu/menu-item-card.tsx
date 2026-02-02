@@ -94,9 +94,10 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
             <Button
               onClick={handleAdd}
               size="sm"
-              className="w-full h-10 bg-primary/15 text-primary hover:bg-primary hover:text-primary-foreground transition-neon active-scale font-semibold"
+              variant="ghost"
+              className="w-full h-8 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-neon active-scale font-medium text-sm"
             >
-              <Plus className="w-4 h-4 mr-1.5" />
+              <Plus className="w-4 h-4 mr-1" />
               {t("menu_add_to_cart")}
             </Button>
           ) : (
@@ -147,15 +148,15 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
           <h3 className="font-semibold text-foreground text-sm truncate">{item.name}</h3>
           <p className="text-primary font-bold text-sm">${item.price.toFixed(2)}</p>
         </div>
-        {quantity === 0 ? (
-          <Button
-            onClick={handleAdd}
-            size="icon"
-            className="h-10 w-10 bg-primary/15 text-primary hover:bg-primary hover:text-primary-foreground active-scale"
-            aria-label={`Add ${item.name} to cart`}
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
+          {quantity === 0 ? (
+            <Button
+              onClick={handleAdd}
+              size="sm"
+              variant="ghost"
+              className="ml-auto text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-neon h-8 px-3 font-medium active-scale"
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
         ) : (
           <div className="flex items-center gap-1 bg-secondary/30 rounded-xl p-1">
             <Button
@@ -226,10 +227,11 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
         {quantity === 0 ? (
           <Button
             onClick={handleAdd}
-            className="w-full md:w-auto md:ml-auto md:flex bg-primary/15 text-primary hover:bg-primary hover:text-primary-foreground transition-neon h-11 px-5 font-semibold active-scale"
+            variant="ghost"
+            className="w-full md:w-auto md:ml-auto md:flex text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-neon h-9 px-4 font-medium text-sm active-scale"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Add to cart
+            <Plus className="w-4 h-4 mr-1.5" />
+            {t("menu_add_to_cart")}
           </Button>
         ) : (
           <div className="flex items-center justify-between md:justify-end gap-3">
