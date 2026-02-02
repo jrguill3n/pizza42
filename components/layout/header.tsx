@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ShoppingCart, User } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -24,15 +23,13 @@ export function Header() {
       <div className="glass-elevated border-b border-border/20">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center group">
-            <Image
-              src="/brand/pizza42-logo.png"
-              alt="Pizza 42"
-              width={160}
-              height={48}
-              className="h-10 w-auto transition-opacity group-hover:opacity-80"
-              priority
-            />
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center border border-primary/20 transition-neon group-hover:bg-primary/20">
+              <span className="text-lg font-black text-primary neon-text-readable">42</span>
+            </div>
+            <span className="text-lg font-bold text-foreground tracking-tight">
+              Pizza <span className="text-primary neon-text-readable">42</span>
+            </span>
           </Link>
 
           {/* Navigation */}
