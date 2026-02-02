@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSessionUser, getAccessTokenWithScopes } from "@/lib/api-auth";
+import { auth0 } from "@/lib/auth0";
 
 export const runtime = "nodejs";
 
@@ -26,29 +26,42 @@ interface Order {
  */
 export async function GET() {
   try {
-    // Validate session and scope
-    const { userId } = await getSessionUser();
-    await getAccessTokenWithScopes(["read:orders"]);
+    // Check session
+    const session = await auth0.getSession();
+    
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
+
+    const userId = session.user.sub as string;
+
+    // Get access token with required scopes
+    const tokenResult = await auth0.getAccessToken();
+    
+    if (!tokenResult || !tokenResult.accessToken) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
+
+    // Verify scope
+    const tokenPayload = JSON.parse(
+      Buffer.from(tokenResult.accessToken.split(".")[1], "base64").toString()
+    );
+    const scopes = (tokenPayload.scope || "").split(" ");
+    
+    if (!scopes.includes("read:orders")) {
+      return NextResponse.json(
+        { error: "insufficient_scope", requiredScopes: ["read:orders"] },
+        { status: 403 }
+      );
+    }
 
     // Get orders for user
     const orders = ordersStore.get(userId) || [];
     
-    return NextResponse.json({ orders });
+    return NextResponse.json({ orders, orders_count: orders.length });
   } catch (error: any) {
-    if (error.statusCode === 401) {
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    }
-    if (error.statusCode === 403) {
-      return NextResponse.json(
-        { 
-          error: "insufficient_scope",
-          requiredScopes: error.requiredScopes || ["read:orders"]
-        },
-        { status: 403 }
-      );
-    }
     console.error("[v0] GET /api/orders error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 }
 
@@ -59,9 +72,34 @@ export async function GET() {
  */
 export async function POST(request: Request) {
   try {
-    // Validate session and scope
-    const { userId } = await getSessionUser();
-    await getAccessTokenWithScopes(["create:orders"]);
+    // Check session
+    const session = await auth0.getSession();
+    
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
+
+    const userId = session.user.sub as string;
+
+    // Get access token with required scopes
+    const tokenResult = await auth0.getAccessToken();
+    
+    if (!tokenResult || !tokenResult.accessToken) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
+
+    // Verify scope
+    const tokenPayload = JSON.parse(
+      Buffer.from(tokenResult.accessToken.split(".")[1], "base64").toString()
+    );
+    const scopes = (tokenPayload.scope || "").split(" ");
+    
+    if (!scopes.includes("create:orders")) {
+      return NextResponse.json(
+        { error: "insufficient_scope", requiredScopes: ["create:orders"] },
+        { status: 403 }
+      );
+    }
 
     // Parse request body
     let body: { items: OrderItem[] };
@@ -98,21 +136,9 @@ export async function POST(request: Request) {
     userOrders.push(order);
     ordersStore.set(userId, userOrders);
 
-    return NextResponse.json({ order }, { status: 201 });
+    return NextResponse.json({ order, orders_count: userOrders.length }, { status: 201 });
   } catch (error: any) {
-    if (error.statusCode === 401) {
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    }
-    if (error.statusCode === 403) {
-      return NextResponse.json(
-        { 
-          error: "insufficient_scope",
-          requiredScopes: error.requiredScopes || ["create:orders"]
-        },
-        { status: 403 }
-      );
-    }
     console.error("[v0] POST /api/orders error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 }

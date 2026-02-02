@@ -11,17 +11,17 @@ export async function GET() {
   try {
     const session = await auth0.getSession();
     
-    if (!session) {
+    if (!session || !session.user) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
 
-    const { token } = await auth0.getAccessToken();
+    const result = await auth0.getAccessToken();
     
-    if (!token) {
+    if (!result || !result.accessToken) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
 
-    return NextResponse.json({ accessToken: token });
+    return NextResponse.json({ accessToken: result.accessToken });
   } catch (error) {
     console.error("[v0] Token retrieval error:", error);
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
