@@ -37,6 +37,7 @@ export async function GET() {
 
   // Get access token with required scopes
   let accessToken: string;
+  let scope: string;
   try {
     const tokenResult = await auth0.getAccessToken();
     
@@ -46,19 +47,16 @@ export async function GET() {
     }
     
     accessToken = tokenResult.accessToken;
+    scope = tokenResult.scope || "";
     console.log("[v0] GET /api/orders: Access token received:", !!accessToken);
+    console.log("[v0] GET /api/orders: Raw scope string:", scope);
   } catch (error: any) {
     console.error("[v0] GET /api/orders: Token retrieval failed:", error.message || error);
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
   // Verify scope
-  const tokenPayload = JSON.parse(
-    Buffer.from(accessToken.split(".")[1], "base64").toString()
-  );
-  const rawScope = tokenPayload.scope || "";
-  console.log("[v0] GET /api/orders: Raw scope string:", rawScope);
-  const scopes = rawScope.split(" ");
+  const scopes = scope.split(" ");
   
   if (!scopes.includes("read:orders")) {
     console.log("[v0] GET /api/orders: Missing required scope read:orders");
@@ -89,6 +87,7 @@ export async function POST(request: Request) {
 
   // Get access token with required scopes
   let accessToken: string;
+  let scope: string;
   try {
     const tokenResult = await auth0.getAccessToken();
     
@@ -98,23 +97,26 @@ export async function POST(request: Request) {
     }
     
     accessToken = tokenResult.accessToken;
+    scope = tokenResult.scope || "";
     console.log("[v0] POST /api/orders: Access token received:", !!accessToken);
+    console.log("[v0] POST /api/orders: Raw scope string:", scope);
   } catch (error: any) {
     console.error("[v0] POST /api/orders: Token retrieval failed:", error.message || error);
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
   // Verify scope
-  const tokenPayload = JSON.parse(
-    Buffer.from(accessToken.split(".")[1], "base64").toString()
-  );
-  const rawScope = tokenPayload.scope || "";
-  console.log("[v0] POST /api/orders: Raw scope string:", rawScope);
-  const scopes = rawScope.split(" ");
+  const scopes = scope.split(" ");
   
   if (!scopes.includes("create:orders")) {
     console.log("[v0] POST /api/orders: Missing required scope create:orders");
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
+
+  // Verify email is verified
+  if (!session.user.email_verified) {
+    console.log("[v0] POST /api/orders: Email not verified");
+    return NextResponse.json({ error: "email_not_verified" }, { status: 403 });
   }
 
   // Parse request body
