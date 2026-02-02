@@ -3,6 +3,7 @@ import { auth0 } from "@/lib/auth0";
 import { getAccessTokenForRequest } from "@/lib/getAccessTokenForRequest";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /**
  * GET /api/auth/token
@@ -10,15 +11,21 @@ export const runtime = "nodejs";
  */
 export async function GET(request: Request) {
   try {
-    const session = await auth0.getSession();
+    const session = await auth0.getSession(request);
     
     if (!session || !session.user) {
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "unauthorized", reason: "no_session" },
+        { status: 401 }
+      );
     }
 
     const result = await getAccessTokenForRequest(request);
     
     const jsonResponse = NextResponse.json({ accessToken: result.accessToken });
+    
+    // Add no-cache headers
+    jsonResponse.headers.set("cache-control", "no-store");
     
     // Preserve any set-cookie headers from the token response
     if (result.response) {

@@ -3,9 +3,7 @@ import * as jose from "jose";
 import { getUser, updateUserMetadata } from "@/lib/auth0Management";
 
 export const runtime = "nodejs";
-
-// In-memory storage for orders (temporary)
-const ordersStore = new Map<string, Array<Order>>();
+export const dynamic = "force-dynamic";
 
 interface OrderItem {
   sku: string;
@@ -28,9 +26,7 @@ let jwksCache: jose.JWTVerifyGetKey | null = null;
 async function getJWKS(): Promise<jose.JWTVerifyGetKey> {
   if (!jwksCache) {
     const issuer = process.env.AUTH0_ISSUER_BASE_URL!;
-    // Ensure trailing slash
-    const issuerUrl = issuer.endsWith("/") ? issuer : `${issuer}/`;
-    const jwksUrl = new URL(".well-known/jwks.json", issuerUrl);
+    const jwksUrl = new URL(`${issuer.replace(/\/$/, "")}/.well-known/jwks.json`);
     jwksCache = jose.createRemoteJWKSet(jwksUrl);
   }
   return jwksCache;
@@ -38,12 +34,11 @@ async function getJWKS(): Promise<jose.JWTVerifyGetKey> {
 
 async function verifyToken(token: string) {
   const issuer = process.env.AUTH0_ISSUER_BASE_URL!;
-  const issuerUrl = issuer.endsWith("/") ? issuer : `${issuer}/`;
   const audience = process.env.AUTH0_AUDIENCE!;
   const JWKS = await getJWKS();
 
   const { payload } = await jose.jwtVerify(token, JWKS, {
-    issuer: issuerUrl,
+    issuer: issuer,
     audience: audience,
   });
 
@@ -80,9 +75,12 @@ export async function GET(request: Request) {
   let payload: any;
   try {
     payload = await verifyToken(token);
-  } catch (error) {
+  } catch (error: any) {
     console.error("[v0] GET /api/orders: JWT verification failed:", error);
-    return NextResponse.json({ error: "invalid_token" }, { status: 401 });
+    return NextResponse.json(
+      { error: "invalid_token", detail: error.code || error.message || "verify_failed" },
+      { status: 401 }
+    );
   }
 
   // Check permissions
@@ -128,9 +126,12 @@ export async function POST(request: Request) {
   let payload: any;
   try {
     payload = await verifyToken(token);
-  } catch (error) {
+  } catch (error: any) {
     console.error("[v0] POST /api/orders: JWT verification failed:", error);
-    return NextResponse.json({ error: "invalid_token" }, { status: 401 });
+    return NextResponse.json(
+      { error: "invalid_token", detail: error.code || error.message || "verify_failed" },
+      { status: 401 }
+    );
   }
 
   // Check permissions
@@ -141,7 +142,8 @@ export async function POST(request: Request) {
     );
   }
 
-  // Check email verification from namespaced claim
+  // Check email verification from namespaced claim on the access token
+  // This claim is set by the Auth0 Post-Login Action using api.accessToken.setCustomClaim()
   const NS = "https://pizza42.example/orders_context";
   const ordersContext = payload[NS];
 
