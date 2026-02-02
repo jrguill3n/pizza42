@@ -76,52 +76,18 @@ async function getUser(domain, token, userId) {
 
 /**
  * Post-Login Action handler
+ * 
+ * Simplified version that adds basic user context to both ID and access tokens.
+ * The access token claim is required by /api/orders POST to validate email_verified.
  */
 exports.onExecutePostLogin = async (event, api) => {
-  const namespace = 'https://pizza42.example/orders_context';
-  
-  try {
-    // Get required secrets
-    const domain = event.secrets.AUTH0_DOMAIN;
-    const clientId = event.secrets.AUTH0_MGMT_CLIENT_ID;
-    const clientSecret = event.secrets.AUTH0_MGMT_CLIENT_SECRET;
-
-    if (!domain || !clientId || !clientSecret) {
-      console.log('[Pizza42] Missing required secrets for Management API');
-      return;
-    }
-
-    // Get Management API token
-    const token = await getManagementToken(domain, clientId, clientSecret);
-
-    // Fetch user data
-    const user = await getUser(domain, token, event.user.user_id);
-
-    // Get orders from user_metadata
-    const orders = user.user_metadata?.orders || [];
-
-    // Compute order statistics
-    const ordersCount = orders.length;
-    const lastOrderAt = ordersCount > 0 
-      ? orders[orders.length - 1].createdAt 
-      : null;
-    const last3Orders = orders.slice(-3).reverse(); // Most recent first
-
-    // Build custom claim payload
-    const claimPayload = {
-      orders_count: ordersCount,
-      last_order_at: lastOrderAt,
-      last_3_orders: last3Orders,
-      email_verified: event.user.email_verified || false,
-    };
-
-    // Set custom claim on both ID token and access token
-    api.idToken.setCustomClaim(namespace, claimPayload);
-    api.accessToken.setCustomClaim(namespace, claimPayload);
-
-    console.log(`[Pizza42] Added orders context: ${ordersCount} orders`);
-  } catch (error) {
-    console.error('[Pizza42] Failed to add orders context:', error.message);
-    // Don't fail the login, just skip the custom claim
-  }
+  const NS = "https://pizza42.example/orders_context";
+  const payload = {
+    ts: new Date().toISOString(),
+    email: event.user.email || null,
+    email_verified: !!event.user.email_verified,
+    note: "post-login action executed"
+  };
+  api.idToken.setCustomClaim(NS, payload);
+  api.accessToken.setCustomClaim(NS, payload);
 };

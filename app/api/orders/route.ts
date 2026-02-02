@@ -145,7 +145,8 @@ export async function POST(request: Request) {
     );
   }
 
-  // Check email verification from namespaced claim
+  // Check email verification from namespaced claim on the access token
+  // This claim is set by the Auth0 Post-Login Action using api.accessToken.setCustomClaim()
   const NS = "https://pizza42.example/orders_context";
   const ordersContext = payload[NS];
 
