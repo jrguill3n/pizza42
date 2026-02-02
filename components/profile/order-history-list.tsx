@@ -3,6 +3,19 @@
 import { useEffect, useState } from "react";
 import { Package, Loader2, AlertCircle } from "lucide-react";
 
+/**
+ * Convert cents to formatted dollar string
+ * @param cents - Amount in cents (integer)
+ * @returns Formatted string like "$12.34"
+ */
+function centsToDollars(cents: number): string {
+  const dollars = cents / 100;
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(dollars);
+}
+
 interface OrderHistoryListProps {
   userId?: string;
 }
@@ -132,7 +145,6 @@ export function OrderHistoryList({ userId }: OrderHistoryListProps) {
       <div className="space-y-3">
         {orders.map((order) => {
           const orderDate = new Date(order.created_at);
-          const totalDollars = order.total_cents / 100;
 
           return (
             <div
@@ -166,7 +178,7 @@ export function OrderHistoryList({ userId }: OrderHistoryListProps) {
 
               <div className="space-y-1">
                 {order.items.map((item, idx) => {
-                  const itemTotal = (item.qty * item.price_cents) / 100;
+                  const itemTotalCents = item.qty * item.price_cents;
                   return (
                     <div
                       key={`${order.id}-${item.sku}-${idx}`}
@@ -176,7 +188,7 @@ export function OrderHistoryList({ userId }: OrderHistoryListProps) {
                         {item.qty}x {item.name}
                       </span>
                       <span className="text-foreground">
-                        ${itemTotal.toFixed(2)}
+                        {centsToDollars(itemTotalCents)}
                       </span>
                     </div>
                   );
@@ -186,7 +198,7 @@ export function OrderHistoryList({ userId }: OrderHistoryListProps) {
               <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/50">
                 <span className="text-sm font-medium text-foreground">Total</span>
                 <span className="text-primary font-bold neon-text-cyan">
-                  ${totalDollars.toFixed(2)}
+                  {centsToDollars(order.total_cents)}
                 </span>
               </div>
             </div>
