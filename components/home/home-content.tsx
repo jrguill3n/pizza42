@@ -220,6 +220,15 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
               </Button>
             </div>
           )}
+
+          {/* Debug info */}
+          <div className="mt-6 pt-4 border-t border-border/20">
+            <p className="text-xs text-muted-foreground/60 font-mono space-y-0.5">
+              <span className="block">auth: {isAuthenticated ? "yes" : "no"}</span>
+              <span className="block">orders_count: {ordersContext?.orders_count ?? 0}</span>
+              <span className="block">lastOrder: {lastOrder ? "yes" : "no"}</span>
+            </p>
+          </div>
         </div>
       </section>
 
