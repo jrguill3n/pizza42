@@ -29,6 +29,8 @@ export const copy = {
     home_guest_cta_signup: "Create account",
     home_date_today: "Today",
     home_date_yesterday: "Yesterday",
+    home_recommended_title: "Recommended for you",
+    home_recommended_subtitle: "Based on your recent orders",
     
     // Menu
     menu_add_to_cart: "Add to Cart",
@@ -87,6 +89,8 @@ export const copy = {
     home_guest_cta_signup: "Crear cuenta",
     home_date_today: "Hoy",
     home_date_yesterday: "Ayer",
+    home_recommended_title: "Recomendado para ti",
+    home_recommended_subtitle: "Basado en tus pedidos recientes",
     
     // Menú
     menu_add_to_cart: "Agregar",

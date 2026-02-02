@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   ChevronRight,
   Sparkles,
@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { MenuItemCard } from "@/components/menu/menu-item-card";
 import { useCart } from "@/components/providers/app-provider";
-import { featuredItems } from "@/lib/mock-data";
+import { mockMenuItems } from "@/lib/mock-data";
 import { toast } from "sonner";
 import type { Auth0User, OrdersContext } from "@/lib/auth0";
 import { getLoginUrl, getSignupUrl, getLogoutUrl } from "@/lib/auth0";
@@ -118,6 +118,25 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
       : lastOrder.total || 
         lastOrder.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
     : 0;
+
+  // Compute personalized recommendations based on order history
+  const recommendedItems = useMemo(() => {
+    if (!isAuthenticated || !ordersContext?.last_3_orders || ordersContext.last_3_orders.length === 0) {
+      return [];
+    }
+
+    // Extract unique SKUs from last 3 orders
+    const orderedSkus = new Set<string>();
+    ordersContext.last_3_orders.forEach(order => {
+      order.items.forEach(item => {
+        orderedSkus.add(item.id);
+      });
+    });
+
+    // Find matching menu items (up to 4)
+    const matches = mockMenuItems.filter(menuItem => orderedSkus.has(menuItem.id));
+    return matches.slice(0, 4);
+  }, [isAuthenticated, ordersContext]);
 
   // Format friendly date helper
   function formatFriendlyDate(iso: string) {
@@ -392,29 +411,27 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
         )}
       </section>
 
-      {/* Featured Items Carousel */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-foreground tracking-tight">
-            Featured
-          </h2>
-          <Link
-            href="/order"
-            className="text-primary text-sm font-semibold hover:underline flex items-center gap-0.5 active-scale"
-          >
-            View all
-            <ChevronRight className="w-4 h-4" />
-          </Link>
-        </div>
+      {/* Personalized Recommendations - Only for authenticated users with order history */}
+      {recommendedItems.length > 0 && (
+        <section>
+          <div className="mb-4">
+            <h2 className="text-lg font-bold text-foreground tracking-tight">
+              {t("home_recommended_title")}
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              {t("home_recommended_subtitle")}
+            </p>
+          </div>
 
-        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory">
-          {featuredItems.map((item) => (
-            <div key={item.id} className="snap-start">
-              <MenuItemCard item={item} variant="featured" />
-            </div>
-          ))}
-        </div>
-      </section>
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory">
+            {recommendedItems.map((item) => (
+              <div key={item.id} className="snap-start">
+                <MenuItemCard item={item} variant="featured" />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   );
 }
