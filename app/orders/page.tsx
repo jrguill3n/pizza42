@@ -1,73 +1,93 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/layout/header";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { Button } from "@/components/ui/button";
-import { Key, ShoppingCart, Send, Copy, Check, AlertCircle } from "lucide-react";
+import { Key, ShoppingCart, Send, Copy, Check, AlertCircle, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface TokenData {
-  access_token: string;
-  scope?: string;
-  expires_in?: number;
+const STORAGE_KEY = "pizza42_access_token";
+
+// Helper to safely parse JSON even on errors
+async function safeJson(res: Response) {
+  try {
+    return await res.json();
+  } catch {
+    return { error: "Failed to parse JSON response" };
+  }
 }
 
 export default function OrdersDebugPage() {
   const [token, setToken] = useState<string>("");
-  const [tokenData, setTokenData] = useState<TokenData | null>(null);
+  const [note, setNote] = useState<string>("order ui");
   const [getResponse, setGetResponse] = useState<any>(null);
   const [postResponse, setPostResponse] = useState<any>(null);
   const [loading, setLoading] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [showEmailBanner, setShowEmailBanner] = useState(false);
+  const [show401Hint, setShow401Hint] = useState(false);
+  const [tokenData, setTokenData] = useState<any>(null);
 
   // Load token from localStorage on mount
-  useState(() => {
-    if (typeof window !== "undefined") {
-      const savedToken = localStorage.getItem("debug_access_token");
-      if (savedToken) {
-        setToken(savedToken);
-      }
+  useEffect(() => {
+    const savedToken = localStorage.getItem(STORAGE_KEY);
+    if (savedToken) {
+      setToken(savedToken);
     }
-  });
+  }, []);
 
   const getAccessToken = async () => {
     setLoading("token");
+    setShow401Hint(false);
     try {
-      const res = await fetch("/api/auth/token");
-      const data = await res.json();
+      const res = await fetch("/api/auth/token", {
+        credentials: "include",
+        cache: "no-store",
+      });
+      const data = await safeJson(res);
 
-      if (res.ok && data.access_token) {
-        setToken(data.access_token);
-        setTokenData(data);
-        localStorage.setItem("debug_access_token", data.access_token);
+      if (res.ok && data.accessToken) {
+        setToken(data.accessToken);
+        localStorage.setItem(STORAGE_KEY, data.accessToken);
       } else {
-        setTokenData({ ...data, access_token: "Error: " + (data.error || "Unknown") });
+        alert(`Failed to get token: ${data.error || "Unknown error"}`);
       }
     } catch (error: any) {
-      setTokenData({ access_token: "Error: " + error.message });
+      alert(`Error: ${error.message}`);
     } finally {
       setLoading(null);
     }
   };
 
+  const clearToken = () => {
+    setToken("");
+    localStorage.removeItem(STORAGE_KEY);
+    setGetResponse(null);
+    setPostResponse(null);
+    setShowEmailBanner(false);
+    setShow401Hint(false);
+  };
+
   const getOrders = async () => {
-    if (!token) {
-      setGetResponse({ error: "No access token. Click 'Get Access Token' first." });
-      return;
-    }
+    if (!token) return;
 
     setLoading("get");
     setShowEmailBanner(false);
+    setShow401Hint(false);
     try {
       const res = await fetch("/api/orders", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        cache: "no-store",
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       setGetResponse({ status: res.status, data });
+
+      if (res.status === 401) {
+        setShow401Hint(true);
+      }
     } catch (error: any) {
       setGetResponse({ error: error.message });
     } finally {
@@ -76,21 +96,18 @@ export default function OrdersDebugPage() {
   };
 
   const postOrder = async () => {
-    if (!token) {
-      setPostResponse({ error: "No access token. Click 'Get Access Token' first." });
-      return;
-    }
+    if (!token) return;
 
     setLoading("post");
     setShowEmailBanner(false);
-    
-    const sampleOrder = {
+    setShow401Hint(false);
+
+    const orderBody = {
       items: [
-        { sku: "PIZZA-001", name: "Margherita Pizza", qty: 1, price_cents: 1299 },
-        { sku: "DRINK-001", name: "Coca Cola", qty: 2, price_cents: 299 },
+        { sku: "pepperoni", name: "Pepperoni", qty: 1, price_cents: 1599 },
       ],
-      total_cents: 1897,
-      note: "Extra cheese please",
+      total_cents: 1599,
+      note: note || "order ui",
     };
 
     try {
@@ -100,14 +117,19 @@ export default function OrdersDebugPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(sampleOrder),
+        body: JSON.stringify(orderBody),
+        cache: "no-store",
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       setPostResponse({ status: res.status, data });
 
       // Check for email verification error
       if (res.status === 403 && data.error === "email_not_verified") {
         setShowEmailBanner(true);
+      }
+
+      if (res.status === 401) {
+        setShow401Hint(true);
       }
     } catch (error: any) {
       setPostResponse({ error: error.message });
@@ -124,9 +146,11 @@ export default function OrdersDebugPage() {
     }
   };
 
-  const maskToken = (token: string) => {
+  const formatTokenDisplay = (token: string) => {
     if (token.length < 20) return token;
-    return `${token.slice(0, 15)}...${token.slice(-10)}`;
+    const first10 = token.slice(0, 10);
+    const last10 = token.slice(-10);
+    return `${first10}...${last10}`;
   };
 
   return (
@@ -146,24 +170,39 @@ export default function OrdersDebugPage() {
 
         {/* Email verification banner */}
         {showEmailBanner && (
-          <div className="glass-elevated rounded-2xl p-4 mb-6 border-2 border-accent/30">
+          <div className="glass-elevated rounded-2xl p-4 mb-6 border-2 border-accent/30 neon-glow-subtle">
             <div className="flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
               <div>
                 <h3 className="font-semibold text-accent mb-1">Verify your email to checkout</h3>
                 <p className="text-sm text-muted-foreground">
-                  You need to verify your email address before placing orders. Check your inbox for a verification link.
+                  Check your inbox for a verification link from Auth0.
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Action buttons */}
+        {/* 401 hint banner */}
+        {show401Hint && (
+          <div className="glass-elevated rounded-2xl p-4 mb-6 border-2 border-destructive/30">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-destructive mb-1">Token expired</h3>
+                <p className="text-sm text-muted-foreground">
+                  Click "Get Token" again to refresh your access token.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Token section */}
         <div className="glass-elevated rounded-2xl p-6 mb-6">
           <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
             <Key className="w-4 h-4 text-primary" />
-            Actions
+            Token
           </h2>
 
           <div className="space-y-3">
@@ -173,9 +212,66 @@ export default function OrdersDebugPage() {
               className="w-full justify-start gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold neon-glow-subtle"
             >
               <Key className="w-4 h-4" />
-              {loading === "token" ? "Getting Token..." : "Get Access Token"}
+              {loading === "token" ? "Getting Token..." : "Get Token"}
             </Button>
 
+            {token && (
+              <>
+                <div>
+                  <label className="text-sm text-muted-foreground mb-2 block">
+                    Token Status
+                  </label>
+                  <div className="glass rounded-lg p-3 space-y-2">
+                    <div className="text-xs text-muted-foreground">
+                      Length: {token.length} chars
+                    </div>
+                    <code className="block text-sm font-mono text-foreground break-all">
+                      {formatTokenDisplay(token)}
+                    </code>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={copyToken}
+                        className="flex-1 bg-transparent"
+                      >
+                        {copied ? (
+                          <>
+                            <Check className="w-4 h-4 mr-2" />
+                            Copied
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-4 h-4 mr-2" />
+                            Copy
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={clearToken}
+                        className="flex-1 bg-transparent text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Clear
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* API section */}
+        <div className="glass-elevated rounded-2xl p-6 mb-6">
+          <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+            <ShoppingCart className="w-4 h-4 text-primary" />
+            API Calls
+          </h2>
+
+          <div className="space-y-3">
             <Button
               onClick={getOrders}
               disabled={loading === "get" || !token}
@@ -186,6 +282,17 @@ export default function OrdersDebugPage() {
               {loading === "get" ? "Loading..." : "GET /api/orders"}
             </Button>
 
+            <div className="space-y-2">
+              <label className="text-sm text-muted-foreground">Note (optional)</label>
+              <input
+                type="text"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="order ui"
+                className="w-full glass rounded-lg px-3 py-2 text-sm font-mono text-foreground bg-transparent border border-border/50 focus:border-primary/50 focus:outline-none"
+              />
+            </div>
+
             <Button
               onClick={postOrder}
               disabled={loading === "post" || !token}
@@ -193,54 +300,10 @@ export default function OrdersDebugPage() {
               className="w-full justify-start gap-2 bg-transparent"
             >
               <Send className="w-4 h-4" />
-              {loading === "post" ? "Sending..." : "POST /api/orders (Sample Order)"}
+              {loading === "post" ? "Sending..." : "POST /api/orders"}
             </Button>
           </div>
         </div>
-
-        {/* Token display */}
-        {tokenData && (
-          <div className="glass-elevated rounded-2xl p-6 mb-6">
-            <h2 className="font-semibold text-foreground mb-4">Access Token</h2>
-            
-            <div className="space-y-3">
-              <div>
-                <label className="text-sm text-muted-foreground mb-1 block">Token</label>
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 glass rounded-lg px-3 py-2 text-sm font-mono text-foreground break-all">
-                    {maskToken(tokenData.access_token)}
-                  </code>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={copyToken}
-                    className="flex-shrink-0 bg-transparent"
-                  >
-                    {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  </Button>
-                </div>
-              </div>
-
-              {tokenData.scope && (
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1 block">Scope</label>
-                  <code className="block glass rounded-lg px-3 py-2 text-sm font-mono text-foreground">
-                    {tokenData.scope}
-                  </code>
-                </div>
-              )}
-
-              {tokenData.expires_in && (
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1 block">Expires In</label>
-                  <code className="block glass rounded-lg px-3 py-2 text-sm font-mono text-foreground">
-                    {tokenData.expires_in}s ({Math.floor(tokenData.expires_in / 60)} minutes)
-                  </code>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* GET Response */}
         {getResponse && (
