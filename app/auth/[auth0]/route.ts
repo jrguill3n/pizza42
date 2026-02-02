@@ -2,7 +2,7 @@ import { handleAuth, handleLogin } from "@auth0/nextjs-auth0/server";
 
 export const runtime = "nodejs";
 
-export const GET = handleAuth({
+const authHandler = handleAuth({
   login: handleLogin({
     authorizationParams: {
       audience: process.env.AUTH0_AUDIENCE,
@@ -10,3 +10,6 @@ export const GET = handleAuth({
     },
   }),
 });
+
+export const GET = authHandler;
+export const POST = authHandler;
