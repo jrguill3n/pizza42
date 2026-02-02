@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   ChevronRight,
   Sparkles,
@@ -13,19 +14,94 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MenuItemCard } from "@/components/menu/menu-item-card";
-import { useCart, useAuth } from "@/components/providers/app-provider";
+import { useCart } from "@/components/providers/app-provider";
 import { featuredItems } from "@/lib/mock-data";
 import { toast } from "sonner";
+import type { Auth0User, OrdersContext } from "@/lib/auth0";
 import { getLoginUrl, getSignupUrl, getLogoutUrl } from "@/lib/auth0";
 
-export function HomeContent() {
-  const { addItem } = useCart();
-  const { session } = useAuth();
-  const router = useRouter();
+interface HomeContentProps {
+  user: Auth0User | null;
+  ordersContext: OrdersContext | null;
+}
 
-  const isAuthenticated = session.isAuthenticated;
-  const user = session.user;
-  const ordersContext = session.claims;
+interface OrderFromAPI {
+  id: string;
+  items: Array<{
+    sku: string;
+    name: string;
+    qty: number;
+    price_cents: number;
+  }>;
+  total_cents: number;
+  created_at: string;
+}
+
+export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeContentProps) {
+  const { addItem } = useCart();
+  const router = useRouter();
+  const [ordersContext, setOrdersContext] = useState<OrdersContext | null>(initialOrdersContext);
+  const [isLoadingOrders, setIsLoadingOrders] = useState(false);
+
+  const isAuthenticated = !!user;
+  
+  // If no orders context from token, fetch from API
+  useEffect(() => {
+    async function fetchOrders() {
+      if (!isAuthenticated || ordersContext) return;
+      
+      setIsLoadingOrders(true);
+      try {
+        // Get access token
+        const tokenRes = await fetch("/api/auth/token", {
+          credentials: "include",
+          cache: "no-store",
+        });
+        
+        if (!tokenRes.ok) return;
+        
+        const { accessToken } = await tokenRes.json();
+        
+        // Fetch orders
+        const ordersRes = await fetch("/api/orders", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          cache: "no-store",
+        });
+        
+        if (ordersRes.ok) {
+          const { orders } = await ordersRes.json() as { orders: OrderFromAPI[] };
+          
+          if (orders && orders.length > 0) {
+            const lastOrder = orders[0];
+            setOrdersContext({
+              orders_count: orders.length,
+              last_order_at: lastOrder.created_at,
+              last_order: {
+                id: lastOrder.id,
+                items: lastOrder.items.map(item => ({
+                  id: item.sku,
+                  name: item.name,
+                  price: item.price_cents / 100,
+                  quantity: item.qty,
+                  category: "pizza" as const,
+                })),
+                total: lastOrder.total_cents / 100,
+              },
+            });
+          }
+        }
+      } catch {
+        // Silently fail - user will see first-order CTA
+      } finally {
+        setIsLoadingOrders(false);
+      }
+    }
+    
+    fetchOrders();
+  }, [isAuthenticated, ordersContext]);
+
   const hasOrders = ordersContext && ordersContext.orders_count > 0;
   const lastOrder = ordersContext?.last_order;
 
