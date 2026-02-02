@@ -107,7 +107,13 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
   const hasOrders = ordersCount > 0 && lastOrder !== null;
 
   // Calculate last order total
-  const lastOrderTotal = lastOrder?.total ?? 0;
+  // Prefer total_cents if available, otherwise use total, or compute from items
+  const lastOrderTotal = lastOrder
+    ? lastOrder.total_cents
+      ? lastOrder.total_cents / 100
+      : lastOrder.total || 
+        lastOrder.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+    : 0;
 
   // Format date helper
   const formatDate = (dateStr: string | null) => {
@@ -221,15 +227,6 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
               </Button>
             </div>
           )}
-
-          {/* Debug info */}
-          <div className="mt-6 pt-4 border-t border-border/20">
-            <p className="text-xs text-muted-foreground/60 font-mono space-y-0.5">
-              <span className="block">auth: {isAuthenticated ? "yes" : "no"}</span>
-              <span className="block">orders_count: {ordersCount}</span>
-              <span className="block">lastOrder: {lastOrder ? "yes" : "no"}</span>
-            </p>
-          </div>
         </div>
       </section>
 
@@ -260,29 +257,21 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Your last order
                 </p>
-                {ordersContext?.last_order_at && (
+                {(lastOrder?.created_at || ordersContext?.last_order_at) && (
                   <p className="text-xs text-muted-foreground">
-                    {formatDate(ordersContext.last_order_at)}
+                    {formatDate(lastOrder?.created_at || ordersContext?.last_order_at || "")}
                   </p>
                 )}
               </div>
 
-              <div className="space-y-2.5 mb-4">
+              <div className="space-y-2 mb-4">
                 {lastOrder.items.map((item, index) => (
                   <div
                     key={`${item.id}-${index}`}
-                    className="flex items-center justify-between py-1"
+                    className="flex items-center gap-2.5 py-1"
                   >
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-6 h-6 rounded-md bg-secondary/50 flex items-center justify-center text-xs font-bold text-muted-foreground">
-                        {item.quantity}
-                      </span>
-                      <span className="text-sm font-medium text-foreground">
-                        {item.name}
-                      </span>
-                    </div>
-                    <span className="text-sm text-muted-foreground tabular-nums">
-                      ${(item.price * item.quantity).toFixed(2)}
+                    <span className="text-sm font-medium text-foreground">
+                      {item.quantity}x {item.name}
                     </span>
                   </div>
                 ))}

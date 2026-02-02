@@ -25,6 +25,8 @@ export interface OrdersContext {
       category: "pizza" | "sides" | "drinks";
     }>;
     total: number;
+    total_cents?: number;
+    created_at?: string;
   }> | null;
 }
 
