@@ -39,6 +39,7 @@ interface CartContextType {
   addItem: (item: OrderItem) => void;
   removeItem: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
+  setCartItems: (items: OrderItem[]) => void;
   clearCart: () => void;
   subtotal: number;
   total: number;
@@ -102,35 +103,45 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback((item: OrderItem) => {
     setItems((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
+      const itemSku = item.sku || item.id;
+      const existing = prev.find((i) => (i.sku || i.id) === itemSku);
       if (existing) {
-        return prev.map((i) => (i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i));
+        return prev.map((i) => 
+          (i.sku || i.id) === itemSku ? { ...i, quantity: i.quantity + 1 } : i
+        );
       }
-      return [...prev, { ...item, quantity: 1 }];
+      return [...prev, { ...item, quantity: item.quantity || 1 }];
     });
   }, []);
 
   const removeItem = useCallback((itemId: string) => {
-    setItems((prev) => prev.filter((i) => i.id !== itemId));
+    setItems((prev) => prev.filter((i) => (i.sku || i.id) !== itemId));
   }, []);
 
   const updateQuantity = useCallback((itemId: string, quantity: number) => {
     if (quantity <= 0) {
-      setItems((prev) => prev.filter((i) => i.id !== itemId));
+      setItems((prev) => prev.filter((i) => (i.sku || i.id) !== itemId));
     } else {
-      setItems((prev) => prev.map((i) => (i.id === itemId ? { ...i, quantity } : i)));
+      setItems((prev) => prev.map((i) => 
+        (i.sku || i.id) === itemId ? { ...i, quantity } : i
+      ));
     }
+  }, []);
+
+  const setCartItems = useCallback((newItems: OrderItem[]) => {
+    setItems(newItems);
   }, []);
 
   const clearCart = useCallback(() => {
     setItems([]);
   }, []);
 
-  // Calculate totals using cents for precision, fall back to price if price_cents not available
-  const subtotal = items.reduce((sum, item) => {
-    const priceInCents = item.price_cents ?? (item.price * 100);
-    return sum + (priceInCents * item.quantity) / 100;
+  // Calculate totals using cents (canonical format)
+  const subtotal_cents = items.reduce((sum, item) => {
+    const priceInCents = item.price_cents ?? 0;
+    return sum + (priceInCents * item.quantity);
   }, 0);
+  const subtotal = subtotal_cents / 100;
   const total = subtotal; // Could add tax/delivery here
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -154,6 +165,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           addItem,
           removeItem,
           updateQuantity,
+          setCartItems,
           clearCart,
           subtotal,
           total,

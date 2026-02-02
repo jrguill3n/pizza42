@@ -152,44 +152,48 @@ export function CartDrawer() {
               </div>
             ) : (
               <div className="space-y-3">
-                {items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/20 border border-border/20"
-                  >
-                    {/* Item visual */}
-                    <div className="w-14 h-14 rounded-xl bg-secondary/40 flex items-center justify-center shrink-0">
-                      <span className="text-lg font-bold text-primary/80">
-                        {item.category === "pizza" ? "P" : item.category === "sides" ? "S" : "D"}
-                      </span>
-                    </div>
+                {items.map((item) => {
+                  const itemId = item.sku || item.id;
+                  const itemPrice = ((item.price_cents ?? 0) * item.quantity) / 100;
+                  
+                  return (
+                    <div
+                      key={itemId}
+                      className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/20 border border-border/20"
+                    >
+                      {/* Item visual */}
+                      <div className="w-14 h-14 rounded-xl bg-secondary/40 flex items-center justify-center shrink-0">
+                        <span className="text-lg font-bold text-primary/80">
+                          {item.category === "pizza" ? "P" : item.category === "sides" ? "S" : "D"}
+                        </span>
+                      </div>
 
-                    {/* Item details */}
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-foreground text-[15px] leading-tight truncate">
-                        {item.name}
-                      </h4>
-                      <p className="text-primary font-bold text-sm mt-0.5">
-                        ${(item.price * item.quantity).toFixed(2)}
-                      </p>
-                    </div>
+                      {/* Item details */}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-foreground text-[15px] leading-tight truncate">
+                          {item.name}
+                        </h4>
+                        <p className="text-primary font-bold text-sm mt-0.5">
+                          ${itemPrice.toFixed(2)}
+                        </p>
+                      </div>
 
-                    {/* Quantity stepper */}
-                    <div className="flex items-center gap-1 bg-secondary/30 rounded-xl p-1">
+                      {/* Quantity stepper */}
+                      <div className="flex items-center gap-1 bg-secondary/30 rounded-xl p-1">
+                        <Button
+                          onClick={() => updateQuantity(itemId, item.quantity - 1)}
+                          size="icon"
+                          variant="ghost"
+                          className="h-9 w-9 text-foreground hover:bg-secondary/50 rounded-lg"
+                          aria-label={`Decrease ${item.name} quantity`}
+                        >
+                          <Minus className="w-4 h-4" />
+                        </Button>
+                        <span className="w-7 text-center font-bold text-foreground">
+                          {item.quantity}
+                        </span>
                       <Button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        size="icon"
-                        variant="ghost"
-                        className="h-9 w-9 text-foreground hover:bg-secondary/50 rounded-lg"
-                        aria-label={`Decrease ${item.name} quantity`}
-                      >
-                        <Minus className="w-4 h-4" />
-                      </Button>
-                      <span className="w-7 text-center font-bold text-foreground">
-                        {item.quantity}
-                      </span>
-                      <Button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(itemId, item.quantity + 1)}
                         size="icon"
                         variant="ghost"
                         className="h-9 w-9 text-foreground hover:bg-secondary/50 rounded-lg"
@@ -199,18 +203,19 @@ export function CartDrawer() {
                       </Button>
                     </div>
 
-                    {/* Remove button */}
+                    {/* Trash */}
                     <Button
-                      onClick={() => handleRemove(item.id, item.name)}
-                      size="icon"
-                      variant="ghost"
-                      className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg shrink-0"
-                      aria-label={`Remove ${item.name} from cart`}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ))}
+                      onClick={() => handleRemove(itemId, item.name)}
+                        size="icon"
+                        variant="ghost"
+                        className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg shrink-0"
+                        aria-label={`Remove ${item.name} from cart`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
