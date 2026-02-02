@@ -139,6 +139,29 @@ export const copy = {
   },
 };
 
+// Menu item name translations (keyed by SKU)
+export const MENU_NAME_ES: Record<string, string> = {
+  // Pizzas
+  p1: "Pepperoni Suprema",
+  p2: "Margherita Neón",
+  p3: "Pollo BBQ Cyber",
+  p4: "Veggie Matrix",
+  p5: "Cárnica Suprema",
+  p6: "Hawaiana Glitch",
+  
+  // Sides
+  s1: "Pan de Ajo",
+  s2: "Bocaditos de Queso",
+  s3: "Alitas x8",
+  s4: "Ensalada César",
+  
+  // Drinks
+  d1: "Cola Neón",
+  d2: "Agua Mineral",
+  d3: "Limonada",
+  d4: "Té Helado",
+};
+
 // Default locale
 const DEFAULT_LOCALE = "es";
 

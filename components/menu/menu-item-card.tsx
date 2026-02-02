@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/providers/app-provider";
 import type { MenuItem } from "@/lib/mock-data";
 import { toast } from "sonner";
-import { t } from "@/lib/copy";
+import { t, MENU_NAME_ES } from "@/lib/copy";
 
 // Helper to generate Unsplash image URLs
 function getMenuItemImage(name: string) {
@@ -26,31 +26,34 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
   const quantity = cartItem?.quantity ?? 0;
   const [imageError, setImageError] = useState(false);
 
+  // Get Spanish display name, fallback to original
+  const displayName = MENU_NAME_ES[item.id] ?? item.name;
+
+  const categoryLetter = item.category === "pizza" ? "P" : item.category === "sides" ? "S" : "D";
+
   const handleAdd = () => {
     addItem({
       sku: item.id, // Use sku as canonical field
-      name: item.name,
+      name: item.name, // Keep original name for API/backend
       price_cents: Math.round(item.price * 100),
       quantity: 1,
     });
-    toast.success(`${item.name} agregado`, {
+    toast.success(`${displayName} agregado`, {
       description: `$${item.price.toFixed(2)} cada uno`,
     });
   };
 
+  const handleDecrement = () => {
+    if (quantity > 0) {
+      updateQuantity(item.id, quantity - 1);
+      toast.success(`${item.name} quantity decreased to ${quantity - 1}`);
+    }
+  };
+
   const handleIncrement = () => {
     updateQuantity(item.id, quantity + 1);
+    toast.success(`${item.name} quantity increased to ${quantity + 1}`);
   };
-
-  const handleDecrement = () => {
-    if (quantity === 1) {
-      toast.info(`${item.name} eliminado`);
-    }
-    updateQuantity(item.id, quantity - 1);
-  };
-
-  // Category icon letter
-  const categoryLetter = item.category === "pizza" ? "P" : item.category === "sides" ? "S" : "D";
 
   if (variant === "featured") {
     return (
@@ -81,7 +84,7 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
         </div>
 
         <h3 className="font-semibold text-foreground text-sm leading-tight mb-1 line-clamp-2 min-h-[2.5rem]">
-          {item.name}
+          {displayName}
         </h3>
         <p className="text-primary font-bold text-lg mb-3">
           ${item.price.toFixed(2)}
@@ -143,18 +146,23 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-foreground text-sm truncate">{item.name}</h3>
-          <p className="text-primary font-bold text-sm">${item.price.toFixed(2)}</p>
+          <h3 className="font-semibold text-foreground text-base leading-tight mb-1">{displayName}</h3>
+          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed mb-3 min-h-[2.5rem]">
+            {item.description}
+          </p>
+          <p className="text-primary font-bold text-lg">
+            ${item.price.toFixed(2)}
+          </p>
         </div>
-          {quantity === 0 ? (
-            <Button
-              onClick={handleAdd}
-              size="sm"
-              variant="ghost"
-              className="ml-auto text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-neon h-8 px-3 font-medium active-scale"
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
+        {quantity === 0 ? (
+          <Button
+            onClick={handleAdd}
+            size="sm"
+            variant="ghost"
+            className="ml-auto text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-neon h-8 px-3 font-medium active-scale"
+          >
+            <Plus className="w-4 h-4" />
+          </Button>
         ) : (
           <div className="flex items-center gap-1 bg-secondary/30 rounded-xl p-1">
             <Button
