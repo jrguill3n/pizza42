@@ -33,35 +33,38 @@ export function Header() {
     <header className="hidden md:block sticky top-0 z-50 w-full">
       <div className="glass-elevated border-b border-border/20">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center border border-primary/20 transition-neon group-hover:bg-primary/20">
-              <span className="text-lg font-black text-primary neon-text-readable">42</span>
-            </div>
-            <span className="text-lg font-bold text-foreground tracking-tight">
-              Pizza <span className="text-primary neon-text-readable">42</span>
-            </span>
-          </Link>
+          {/* Left Group: Logo + Navigation */}
+          <div className="flex items-center gap-6">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center border border-primary/20 transition-neon group-hover:bg-primary/20">
+                <span className="text-lg font-black text-primary neon-text-readable">42</span>
+              </div>
+              <span className="text-lg font-bold text-foreground tracking-tight">
+                Pizza <span className="text-primary neon-text-readable">42</span>
+              </span>
+            </Link>
 
-          {/* Navigation */}
-          <nav className="flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "px-4 py-2 rounded-lg text-sm font-semibold transition-neon",
-                  pathname === link.href
-                    ? "bg-primary/15 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
-                )}
-              >
-                {t(link.label)}
-              </Link>
-            ))}
-          </nav>
+            {/* Navigation */}
+            <nav className="flex items-center gap-1">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "px-4 py-2 rounded-lg text-sm font-semibold transition-neon",
+                    pathname === link.href
+                      ? "bg-primary/15 text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
+                  )}
+                >
+                  {t(link.label)}
+                </Link>
+              ))}
+            </nav>
+          </div>
 
-          {/* Right side */}
+          {/* Right Group: Cart + Auth */}
           <div className="flex items-center gap-3">
             {/* Cart indicator */}
             {session.isAuthenticated ? (
