@@ -17,6 +17,7 @@ function getJWKS() {
 export interface AccessTokenPayload {
   sub: string;
   scope?: string;
+  permissions?: string[];
   email?: string;
   email_verified?: boolean;
   [key: string]: unknown;
@@ -64,17 +65,25 @@ export async function verifyAccessToken(
 }
 
 /**
- * Check if the token has the required scope
+ * Check if the token has the required scope or permission
+ * Supports both Auth0 RBAC permissions and traditional scopes
  */
 export function requireScope(
   payload: AccessTokenPayload,
   requiredScope: string
 ): { error: string; status: number } | null {
-  const scopes = payload.scope?.split(" ") ?? [];
-  if (!scopes.includes(requiredScope)) {
-    return { error: `Missing required scope: ${requiredScope}`, status: 403 };
+  // Check permissions array (RBAC)
+  if (payload.permissions?.includes(requiredScope)) {
+    return null;
   }
-  return null;
+  
+  // Check scope string (traditional OAuth scopes)
+  const scopes = payload.scope?.split(" ") ?? [];
+  if (scopes.includes(requiredScope)) {
+    return null;
+  }
+  
+  return { error: `Missing required scope: ${requiredScope}`, status: 403 };
 }
 
 /**
