@@ -1,22 +1,30 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth0 } from "@/lib/auth0";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /**
  * GET /api/me
  * Returns current user info from session
  */
-export async function GET() {
-  const session = await auth0.getSession();
+export async function GET(request: NextRequest) {
+  const session = await auth0.getSession(request);
 
   if (!session || !session.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    return NextResponse.json({ 
+      authenticated: false 
+    });
   }
 
   return NextResponse.json({
-    sub: session.user.sub,
-    email: session.user.email,
-    email_verified: session.user.email_verified,
+    authenticated: true,
+    user: {
+      email: session.user.email,
+      name: session.user.name,
+      given_name: session.user.given_name,
+      family_name: session.user.family_name,
+      picture: session.user.picture,
+    },
   });
 }

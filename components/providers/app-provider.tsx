@@ -1,8 +1,22 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
-import type { OrderItem, Session, User } from "@/lib/mock-data";
-import { getSessionMock } from "@/lib/mock-data";
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
+import type { OrderItem } from "@/lib/mock-data";
+
+interface User {
+  sub: string;
+  email?: string;
+  email_verified?: boolean;
+  name?: string;
+  given_name?: string;
+  family_name?: string;
+  picture?: string;
+}
+
+interface Session {
+  isAuthenticated: boolean;
+  user: User | null;
+}
 
 interface CartContextType {
   items: OrderItem[];
@@ -19,7 +33,7 @@ interface AuthContextType {
   session: Session;
   login: () => void;
   logout: () => void;
-  setUserType: (type: "logged-out" | "verified" | "unverified" | "newVerified") => void;
+  refreshSession: () => void;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -41,9 +55,37 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // Cart state
   const [items, setItems] = useState<OrderItem[]>([]);
 
-  // Auth state - defaults to verified for demo
-  const [userType, setUserTypeState] = useState<"logged-out" | "verified" | "unverified" | "newVerified">("verified");
-  const [session, setSession] = useState<Session>(() => getSessionMock(userType));
+  // Auth state - fetch real session from API
+  const [session, setSession] = useState<Session>({ isAuthenticated: false, user: null });
+
+  const fetchSession = useCallback(async () => {
+    try {
+      const res = await fetch("/api/me", {
+        credentials: "include",
+        cache: "no-store",
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        console.log("[v0] Session fetched:", data);
+        // Map API response (authenticated) to internal format (isAuthenticated)
+        setSession({
+          isAuthenticated: data.authenticated || false,
+          user: data.user || null,
+        });
+      } else {
+        console.log("[v0] Session fetch failed, not authenticated");
+        setSession({ isAuthenticated: false, user: null });
+      }
+    } catch (error) {
+      console.error("[v0] Failed to fetch session:", error);
+      setSession({ isAuthenticated: false, user: null });
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSession();
+  }, [fetchSession]);
 
   const addItem = useCallback((item: OrderItem) => {
     setItems((prev) => {
@@ -83,13 +125,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     window.location.href = "/auth/logout";
   }, []);
 
-  const setUserType = useCallback((type: "logged-out" | "verified" | "unverified" | "newVerified") => {
-    setUserTypeState(type);
-    setSession(getSessionMock(type));
-  }, []);
+  const refreshSession = useCallback(() => {
+    fetchSession();
+  }, [fetchSession]);
 
   return (
-    <AuthContext.Provider value={{ session, login, logout, setUserType }}>
+    <AuthContext.Provider value={{ session, login, logout, refreshSession }}>
       <CartContext.Provider
         value={{
           items,
