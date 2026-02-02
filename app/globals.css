@@ -5,27 +5,27 @@
 
 /* Pizza 42 Neon Dark Theme - Dark mode first */
 :root {
-  /* Deep dark background with slight blue tint */
-  --background: oklch(0.12 0.02 260);
-  --foreground: oklch(0.95 0 0);
+  /* Softer deep slate background with blue tint */
+  --background: oklch(0.18 0.025 250);
+  --foreground: oklch(0.98 0 0);
   
-  /* Glassmorphism cards */
-  --card: oklch(0.16 0.015 260 / 0.8);
-  --card-foreground: oklch(0.95 0 0);
+  /* Glassmorphism cards - lighter with visible border */
+  --card: oklch(0.22 0.02 250 / 0.85);
+  --card-foreground: oklch(0.98 0 0);
   
-  --popover: oklch(0.14 0.02 260 / 0.95);
-  --popover-foreground: oklch(0.95 0 0);
+  --popover: oklch(0.2 0.02 250 / 0.95);
+  --popover-foreground: oklch(0.98 0 0);
   
   /* Neon cyan primary */
   --primary: oklch(0.75 0.18 195);
-  --primary-foreground: oklch(0.12 0.02 260);
+  --primary-foreground: oklch(0.18 0.025 250);
   
-  /* Secondary muted */
-  --secondary: oklch(0.22 0.02 260);
-  --secondary-foreground: oklch(0.9 0 0);
+  /* Secondary muted - lighter */
+  --secondary: oklch(0.28 0.02 250);
+  --secondary-foreground: oklch(0.95 0 0);
   
-  --muted: oklch(0.2 0.015 260);
-  --muted-foreground: oklch(0.65 0 0);
+  --muted: oklch(0.25 0.02 250);
+  --muted-foreground: oklch(0.72 0.01 250);
   
   /* Neon purple accent */
   --accent: oklch(0.65 0.25 300);
@@ -34,8 +34,8 @@
   --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
   
-  --border: oklch(0.28 0.03 260 / 0.6);
-  --input: oklch(0.2 0.02 260);
+  --border: oklch(0.35 0.03 250 / 0.5);
+  --input: oklch(0.25 0.02 250);
   --ring: oklch(0.75 0.18 195);
   
   /* Neon chart colors */
@@ -64,24 +64,24 @@
 
 .dark {
   /* Same as root - dark mode first */
-  --background: oklch(0.12 0.02 260);
-  --foreground: oklch(0.95 0 0);
-  --card: oklch(0.16 0.015 260 / 0.8);
-  --card-foreground: oklch(0.95 0 0);
-  --popover: oklch(0.14 0.02 260 / 0.95);
-  --popover-foreground: oklch(0.95 0 0);
+  --background: oklch(0.18 0.025 250);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.22 0.02 250 / 0.85);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.2 0.02 250 / 0.95);
+  --popover-foreground: oklch(0.98 0 0);
   --primary: oklch(0.75 0.18 195);
-  --primary-foreground: oklch(0.12 0.02 260);
-  --secondary: oklch(0.22 0.02 260);
-  --secondary-foreground: oklch(0.9 0 0);
-  --muted: oklch(0.2 0.015 260);
-  --muted-foreground: oklch(0.65 0 0);
+  --primary-foreground: oklch(0.18 0.025 250);
+  --secondary: oklch(0.28 0.02 250);
+  --secondary-foreground: oklch(0.95 0 0);
+  --muted: oklch(0.25 0.02 250);
+  --muted-foreground: oklch(0.72 0.01 250);
   --accent: oklch(0.65 0.25 300);
   --accent-foreground: oklch(0.98 0 0);
   --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.28 0.03 260 / 0.6);
-  --input: oklch(0.2 0.02 260);
+  --border: oklch(0.35 0.03 250 / 0.5);
+  --input: oklch(0.25 0.02 250);
   --ring: oklch(0.75 0.18 195);
   --chart-1: oklch(0.75 0.18 195);
   --chart-2: oklch(0.65 0.25 300);
@@ -153,35 +153,35 @@
 
 /* Glassmorphism utility */
 .glass {
-  background: oklch(0.16 0.015 260 / 0.6);
+  background: oklch(0.22 0.02 250 / 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid oklch(0.35 0.03 260 / 0.3);
+  border: 1px solid oklch(0.38 0.03 250 / 0.4);
 }
 
-/* Neon glow effects */
+/* Neon glow effects - reduced intensity by 25% */
 .neon-glow-cyan {
-  box-shadow: 0 0 20px oklch(0.75 0.18 195 / 0.4),
-              0 0 40px oklch(0.75 0.18 195 / 0.2),
-              inset 0 0 20px oklch(0.75 0.18 195 / 0.1);
+  box-shadow: 0 0 16px oklch(0.75 0.18 195 / 0.3),
+              0 0 32px oklch(0.75 0.18 195 / 0.15),
+              inset 0 0 16px oklch(0.75 0.18 195 / 0.075);
 }
 
 .neon-glow-purple {
-  box-shadow: 0 0 20px oklch(0.65 0.25 300 / 0.4),
-              0 0 40px oklch(0.65 0.25 300 / 0.2),
-              inset 0 0 20px oklch(0.65 0.25 300 / 0.1);
+  box-shadow: 0 0 16px oklch(0.65 0.25 300 / 0.3),
+              0 0 32px oklch(0.65 0.25 300 / 0.15),
+              inset 0 0 16px oklch(0.65 0.25 300 / 0.075);
 }
 
 .neon-text-cyan {
-  text-shadow: 0 0 10px oklch(0.75 0.18 195 / 0.8),
-               0 0 20px oklch(0.75 0.18 195 / 0.5),
-               0 0 30px oklch(0.75 0.18 195 / 0.3);
+  text-shadow: 0 0 8px oklch(0.75 0.18 195 / 0.6),
+               0 0 16px oklch(0.75 0.18 195 / 0.375),
+               0 0 24px oklch(0.75 0.18 195 / 0.225);
 }
 
 .neon-text-purple {
-  text-shadow: 0 0 10px oklch(0.65 0.25 300 / 0.8),
-               0 0 20px oklch(0.65 0.25 300 / 0.5),
-               0 0 30px oklch(0.65 0.25 300 / 0.3);
+  text-shadow: 0 0 8px oklch(0.65 0.25 300 / 0.6),
+               0 0 16px oklch(0.65 0.25 300 / 0.375),
+               0 0 24px oklch(0.65 0.25 300 / 0.225);
 }
 
 /* Smooth transitions */
@@ -228,10 +228,10 @@
 
 /* Glass card with elevated look */
 .glass-elevated {
-  background: oklch(0.18 0.015 260 / 0.7);
+  background: oklch(0.24 0.02 250 / 0.8);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid oklch(0.4 0.03 260 / 0.25);
-  box-shadow: 0 4px 24px oklch(0 0 0 / 0.3),
-              0 1px 2px oklch(0 0 0 / 0.2);
+  border: 1px solid oklch(0.42 0.03 250 / 0.35);
+  box-shadow: 0 4px 24px oklch(0 0 0 / 0.25),
+              0 1px 2px oklch(0 0 0 / 0.15);
 }
