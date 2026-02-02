@@ -44,7 +44,9 @@ interface ApiError {
  */
 export async function getAccessToken(): Promise<string | null> {
   try {
-    const response = await fetch("/api/auth/token");
+    const response = await fetch("/api/auth/token", {
+      credentials: "include",
+    });
     
     if (response.status === 401) {
       return null;
@@ -81,6 +83,7 @@ export async function placeOrder(
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({ items }),
+      credentials: "include",
     });
     
     const data = await response.json();
@@ -116,6 +119,7 @@ export async function getOrders(): Promise<{ success: true; orders: Order[]; ord
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+      credentials: "include",
     });
     
     if (!response.ok) {
