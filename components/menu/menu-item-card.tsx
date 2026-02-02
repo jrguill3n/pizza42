@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
 import { Plus, Minus, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -7,6 +9,12 @@ import { useCart } from "@/components/providers/app-provider";
 import type { MenuItem } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { t } from "@/lib/copy";
+
+// Helper to generate Unsplash image URLs
+function getMenuItemImage(name: string) {
+  const q = name.toLowerCase().replace(/[^a-z0-9]+/g, ",");
+  return `https://source.unsplash.com/600x400/?${q},food`;
+}
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -17,6 +25,7 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
   const { items, addItem, updateQuantity } = useCart();
   const cartItem = items.find((i) => i.id === item.id);
   const quantity = cartItem?.quantity ?? 0;
+  const [imageError, setImageError] = useState(false);
 
   const handleAdd = () => {
     addItem({
@@ -48,13 +57,29 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
   if (variant === "featured") {
     return (
       <div className="glass-elevated rounded-2xl p-4 min-w-[180px] w-[180px] flex flex-col transition-neon hover:neon-glow-subtle group">
-        {/* Image placeholder */}
-        <div className="w-full aspect-square rounded-xl bg-secondary/30 mb-3 flex items-center justify-center overflow-hidden">
-          <div className="w-14 h-14 rounded-full bg-primary/15 flex items-center justify-center">
-            <span className="text-xl font-bold text-primary/70">
-              {categoryLetter}
-            </span>
-          </div>
+        {/* Image */}
+        <div className="w-full aspect-square rounded-xl bg-secondary/30 mb-3 flex items-center justify-center overflow-hidden relative">
+          {!imageError ? (
+            <>
+              <Image
+                src={getMenuItemImage(item.name) || "/placeholder.svg"}
+                alt={item.name}
+                fill
+                className="object-cover"
+                loading="lazy"
+                onError={() => setImageError(true)}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+            </>
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/20 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-primary/15 flex items-center justify-center">
+                <span className="text-xl font-bold text-primary/70">
+                  {categoryLetter}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         <h3 className="font-semibold text-foreground text-sm leading-tight mb-1 line-clamp-2 min-h-[2.5rem]">
@@ -104,8 +129,21 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
   if (variant === "compact") {
     return (
       <div className="flex items-center gap-3 p-3 glass-elevated rounded-xl transition-neon hover:bg-secondary/30">
-        <div className="w-12 h-12 rounded-lg bg-secondary/40 flex items-center justify-center shrink-0">
-          <span className="text-base font-bold text-primary/70">{categoryLetter}</span>
+        <div className="w-12 h-12 rounded-lg bg-secondary/40 flex items-center justify-center shrink-0 overflow-hidden relative">
+          {!imageError ? (
+            <>
+              <Image
+                src={getMenuItemImage(item.name) || "/placeholder.svg"}
+                alt={item.name}
+                fill
+                className="object-cover"
+                loading="lazy"
+                onError={() => setImageError(true)}
+              />
+            </>
+          ) : (
+            <span className="text-base font-bold text-primary/70">{categoryLetter}</span>
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-foreground text-sm truncate">{item.name}</h3>
@@ -150,13 +188,29 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
   return (
     <div className="glass-elevated rounded-2xl p-4 transition-neon hover:neon-glow-subtle group">
       <div className="flex gap-4">
-        {/* Image placeholder */}
-        <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl bg-secondary/30 flex items-center justify-center shrink-0">
-          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/15 flex items-center justify-center">
-            <span className="text-lg md:text-xl font-bold text-primary/70">
-              {categoryLetter}
-            </span>
-          </div>
+        {/* Image */}
+        <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl bg-secondary/30 flex items-center justify-center shrink-0 overflow-hidden relative">
+          {!imageError ? (
+            <>
+              <Image
+                src={getMenuItemImage(item.name) || "/placeholder.svg"}
+                alt={item.name}
+                fill
+                className="object-cover"
+                loading="lazy"
+                onError={() => setImageError(true)}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+            </>
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/20 flex items-center justify-center">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/15 flex items-center justify-center">
+                <span className="text-lg md:text-xl font-bold text-primary/70">
+                  {categoryLetter}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Content */}
