@@ -3,22 +3,31 @@ import { auth0 } from "@/lib/auth0";
 import { getAccessTokenForRequest } from "@/lib/getAccessTokenForRequest";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /**
  * GET /api/debug/token
- * Debug endpoint to check Auth0 session and access token retrieval
- * Returns session status, token status, and scope information
+ * Debug endpoint to diagnose access token retrieval
+ * Returns safe token diagnostics without exposing the full token
  */
 export async function GET(request: Request) {
   // Check session
-  const session = await auth0.getSession();
-  const hasSession = !!session;
-
-  if (!hasSession) {
+  let session;
+  try {
+    session = await auth0.getSession(request);
+  } catch (error: any) {
     return NextResponse.json({
-      hasSession: false,
-      hasAccessToken: false,
-      scope: null,
+      ok: false,
+      error: "session_read_failed",
+      message: error.message || "Failed to read session",
+    });
+  }
+
+  if (!session) {
+    return NextResponse.json({
+      ok: false,
+      error: "no_session",
+      message: "No active session found",
     });
   }
 
@@ -26,12 +35,14 @@ export async function GET(request: Request) {
   try {
     const tokenResult = await getAccessTokenForRequest(request);
 
+    const token = tokenResult.accessToken;
     const jsonResponse = NextResponse.json({
+      ok: true,
       hasSession: true,
-      hasAccessToken: true,
-      scope: tokenResult.scope || "",
+      tokenLength: token.length,
+      tokenStartsWith: token.substring(0, 12),
     });
-    
+
     // Preserve any set-cookie headers from the token response
     if (tokenResult.response) {
       const cookies = tokenResult.response.headers.get("set-cookie");
@@ -39,17 +50,30 @@ export async function GET(request: Request) {
         jsonResponse.headers.set("set-cookie", cookies);
       }
     }
-    
+
     return jsonResponse;
   } catch (error: any) {
-    return NextResponse.json(
-      {
-        hasSession: true,
-        hasAccessToken: false,
-        errorName: error.name || "UnknownError",
-        errorMessage: error.message || "Token retrieval failed",
-      },
-      { status: 500 }
-    );
+    // Extract safe error details
+    let message = error.message || "Token exchange failed";
+    let status = 500;
+
+    // If error has a response object, extract status
+    if (error.response) {
+      status = error.response.status || 500;
+    } else if (error.status) {
+      status = error.status;
+    }
+
+    // Sanitize message to avoid exposing sensitive info
+    if (message.includes("token") || message.includes("secret") || message.includes("key")) {
+      message = "Token exchange failed";
+    }
+
+    return NextResponse.json({
+      ok: false,
+      error: "token_exchange_failed",
+      message: message.substring(0, 200),
+      status,
+    });
   }
 }
