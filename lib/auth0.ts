@@ -77,9 +77,8 @@ export function getSignupUrl(returnTo?: string): string {
 }
 
 /**
- * Generate logout URL with optional returnTo path
+ * Generate logout URL (returnTo is handled server-side as absolute URL)
  */
-export function getLogoutUrl(returnTo?: string): string {
-  const params = returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : "";
-  return `/auth/logout${params}`;
+export function getLogoutUrl(): string {
+  return "/auth/logout";
 }
