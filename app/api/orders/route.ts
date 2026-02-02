@@ -51,6 +51,17 @@ export async function GET() {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
+  // Verify scope
+  const tokenPayload = JSON.parse(
+    Buffer.from(accessToken.split(".")[1], "base64").toString()
+  );
+  const scopes = (tokenPayload.scope || "").split(" ");
+  
+  if (!scopes.includes("read:orders")) {
+    console.log("[v0] GET /api/orders: Missing required scope read:orders");
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
+
   // Get orders for user
   const orders = ordersStore.get(userId) || [];
   
@@ -87,6 +98,17 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error("[v0] POST /api/orders: Token retrieval failed:", error.message || error);
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  // Verify scope
+  const tokenPayload = JSON.parse(
+    Buffer.from(accessToken.split(".")[1], "base64").toString()
+  );
+  const scopes = (tokenPayload.scope || "").split(" ");
+  
+  if (!scopes.includes("create:orders")) {
+    console.log("[v0] POST /api/orders: Missing required scope create:orders");
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
   // Parse request body
