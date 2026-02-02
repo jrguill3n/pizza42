@@ -46,6 +46,7 @@ export async function GET() {
     }
     
     accessToken = tokenResult.accessToken;
+    console.log("[v0] GET /api/orders: Access token received:", !!accessToken);
   } catch (error: any) {
     console.error("[v0] GET /api/orders: Token retrieval failed:", error.message || error);
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
@@ -55,7 +56,9 @@ export async function GET() {
   const tokenPayload = JSON.parse(
     Buffer.from(accessToken.split(".")[1], "base64").toString()
   );
-  const scopes = (tokenPayload.scope || "").split(" ");
+  const rawScope = tokenPayload.scope || "";
+  console.log("[v0] GET /api/orders: Raw scope string:", rawScope);
+  const scopes = rawScope.split(" ");
   
   if (!scopes.includes("read:orders")) {
     console.log("[v0] GET /api/orders: Missing required scope read:orders");
@@ -95,6 +98,7 @@ export async function POST(request: Request) {
     }
     
     accessToken = tokenResult.accessToken;
+    console.log("[v0] POST /api/orders: Access token received:", !!accessToken);
   } catch (error: any) {
     console.error("[v0] POST /api/orders: Token retrieval failed:", error.message || error);
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
@@ -104,7 +108,9 @@ export async function POST(request: Request) {
   const tokenPayload = JSON.parse(
     Buffer.from(accessToken.split(".")[1], "base64").toString()
   );
-  const scopes = (tokenPayload.scope || "").split(" ");
+  const rawScope = tokenPayload.scope || "";
+  console.log("[v0] POST /api/orders: Raw scope string:", rawScope);
+  const scopes = rawScope.split(" ");
   
   if (!scopes.includes("create:orders")) {
     console.log("[v0] POST /api/orders: Missing required scope create:orders");
