@@ -1,13 +1,7 @@
-import { Auth0Client } from "@auth0/nextjs-auth0/server";
-
-// Create Auth0 client singleton with configuration
-export const auth0 = new Auth0Client({
-  authorizationParameters: {
-    audience: process.env.AUTH0_AUDIENCE,
-    scope: "openid profile email read:orders create:orders",
-  },
-  beforeSessionSaved: async (session) => ({ ...session }),
-});
+/**
+ * Client-safe Auth0 types and utilities
+ * Server-only functions are in lib/auth0.server.ts
+ */
 
 // Custom claim namespace for orders context
 export const ORDERS_CONTEXT_CLAIM = "https://pizza42.example/orders_context";
@@ -40,36 +34,7 @@ export interface Auth0User {
   [ORDERS_CONTEXT_CLAIM]?: OrdersContext;
 }
 
-/**
- * Get the current session including user (server-side only)
- */
-export async function getAuth0Session() {
-  return await auth0.getSession();
-}
-
-/**
- * Get the current authenticated user from the session (server-side only)
- */
-export async function getSessionUserServer(): Promise<Auth0User | null> {
-  const session = await auth0.getSession();
-  return (session?.user as Auth0User) ?? null;
-}
-
-/**
- * Extract orders context from user claims
- */
-export function getOrdersContext(user: Auth0User | null): OrdersContext | null {
-  if (!user) return null;
-  return user[ORDERS_CONTEXT_CLAIM] ?? null;
-}
-
-/**
- * Extract orders context from session
- */
-export function getOrdersContextFromSession(session: any): OrdersContext | null {
-  if (!session?.user) return null;
-  return (session.user as Auth0User)[ORDERS_CONTEXT_CLAIM] ?? null;
-}
+import { auth0 } from "./auth0.server"; // Import auth0 variable
 
 /**
  * Generate login URL with optional returnTo path
