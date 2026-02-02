@@ -68,7 +68,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (res.ok) {
         const data = await res.json();
         console.log("[v0] Session fetched:", data);
-        setSession(data);
+        // Map API response (authenticated) to internal format (isAuthenticated)
+        setSession({
+          isAuthenticated: data.authenticated || false,
+          user: data.user || null,
+        });
       } else {
         console.log("[v0] Session fetch failed, not authenticated");
         setSession({ isAuthenticated: false, user: null });
