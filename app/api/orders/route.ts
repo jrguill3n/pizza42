@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import * as jose from "jose";
+import { auth0 } from "@/lib/auth0";
 
 export const runtime = "nodejs";
 
@@ -133,8 +134,13 @@ export async function POST(request: Request) {
   // Get user ID from token
   const userId = payload.sub as string;
 
-  // Verify email is verified
-  if (!payload.email_verified) {
+  // Verify email is verified (server-side session check)
+  const session = await auth0.getSession();
+  if (!session || !session.user) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  if (session.user.email_verified !== true) {
     return NextResponse.json({ error: "email_not_verified" }, { status: 403 });
   }
 
