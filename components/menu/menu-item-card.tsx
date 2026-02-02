@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { Plus, Minus, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -62,12 +61,12 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
         <div className="w-full aspect-square rounded-xl bg-secondary/30 mb-3 flex items-center justify-center overflow-hidden relative">
           {!imageError ? (
             <>
-              <Image
+              <img
                 src={getMenuItemImage(item.name) || "/placeholder.svg"}
                 alt={item.name}
-                fill
-                className="object-cover"
                 loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover rounded-xl"
                 onError={() => setImageError(true)}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
@@ -130,18 +129,16 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
   if (variant === "compact") {
     return (
       <div className="flex items-center gap-3 p-3 glass-elevated rounded-xl transition-neon hover:bg-secondary/30">
-        <div className="w-12 h-12 rounded-lg bg-secondary/40 flex items-center justify-center shrink-0 overflow-hidden relative">
+        <div className="w-12 h-12 rounded-lg bg-secondary/40 flex items-center justify-center shrink-0 overflow-hidden">
           {!imageError ? (
-            <>
-              <Image
-                src={getMenuItemImage(item.name) || "/placeholder.svg"}
-                alt={item.name}
-                fill
-                className="object-cover"
-                loading="lazy"
-                onError={() => setImageError(true)}
-              />
-            </>
+            <img
+              src={getMenuItemImage(item.name) || "/placeholder.svg"}
+              alt={item.name}
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover rounded-lg"
+              onError={() => setImageError(true)}
+            />
           ) : (
             <span className="text-base font-bold text-primary/70">{categoryLetter}</span>
           )}
@@ -193,12 +190,12 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
         <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl bg-secondary/30 flex items-center justify-center shrink-0 overflow-hidden relative">
           {!imageError ? (
             <>
-              <Image
+              <img
                 src={getMenuItemImage(item.name) || "/placeholder.svg"}
                 alt={item.name}
-                fill
-                className="object-cover"
                 loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover rounded-xl"
                 onError={() => setImageError(true)}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
