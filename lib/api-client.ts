@@ -76,13 +76,33 @@ export async function placeOrder(
       return { success: false, error: "Not authenticated", code: "not_authenticated" };
     }
     
+    // Transform cart items to API format
+    const apiItems = items.map(item => ({
+      sku: item.id,
+      name: item.name,
+      qty: item.quantity,
+      price_cents: Math.round(item.price * 100), // Convert dollars to cents
+    }));
+    
+    // Calculate total_cents from items
+    const total_cents = apiItems.reduce(
+      (sum, item) => sum + item.qty * item.price_cents,
+      0
+    );
+    
+    const payload = {
+      items: apiItems,
+      total_cents,
+      note: "Order from Pizza 42 UI",
+    };
+    
     const response = await fetch("/api/orders", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({ items }),
+      body: JSON.stringify(payload),
       credentials: "include",
     });
     
