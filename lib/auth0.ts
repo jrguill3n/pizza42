@@ -34,8 +34,6 @@ export interface Auth0User {
   [ORDERS_CONTEXT_CLAIM]?: OrdersContext;
 }
 
-import { auth0 } from "./auth0.server"; // Import auth0 variable
-
 /**
  * Generate login URL with optional returnTo path
  */
