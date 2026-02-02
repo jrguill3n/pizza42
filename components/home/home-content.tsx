@@ -35,11 +35,33 @@ export function HomeContent({ user, ordersContext }: HomeContentProps) {
   // Calculate last order total
   const lastOrderTotal = lastOrder?.total ?? 0;
 
+  // Format date helper
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return "today";
+    if (diffDays === 1) return "yesterday";
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  };
+
   const handleRepeatOrder = () => {
     if (!lastOrder?.items) return;
+    
+    // Convert last order items to cart items (matching OrderItem interface)
     lastOrder.items.forEach((item) => {
-      addItem(item);
+      addItem({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        category: item.category,
+      });
     });
+    
     toast.success("Added to cart", {
       description: "Your last order is ready to checkout",
     });
@@ -130,7 +152,7 @@ export function HomeContent({ user, ordersContext }: HomeContentProps) {
 
       {/* Personalization Card - High conversion "Repeat Order" */}
       <section className="mb-6">
-        {isAuthenticated && hasOrders && lastOrder?.items ? (
+        {isAuthenticated && hasOrders && lastOrder?.items && lastOrder.items.length > 0 ? (
           <div className="glass-elevated rounded-2xl overflow-hidden">
             {/* Header with highlight */}
             <div className="px-5 py-4 border-b border-border/20 bg-accent/5">
@@ -138,12 +160,12 @@ export function HomeContent({ user, ordersContext }: HomeContentProps) {
                 <div className="w-9 h-9 rounded-xl bg-accent/20 flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-accent" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <h2 className="text-base font-bold text-foreground">
-                    Welcome back!
+                    Welcome back
                   </h2>
                   <p className="text-xs text-muted-foreground">
-                    Ready for another order?
+                    Reorder your last order in one tap
                   </p>
                 </div>
               </div>
@@ -151,14 +173,21 @@ export function HomeContent({ user, ordersContext }: HomeContentProps) {
 
             {/* Order summary */}
             <div className="px-5 py-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                Your last order
-              </p>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Your last order
+                </p>
+                {ordersContext?.last_order_at && (
+                  <p className="text-xs text-muted-foreground">
+                    {formatDate(ordersContext.last_order_at)}
+                  </p>
+                )}
+              </div>
 
               <div className="space-y-2.5 mb-4">
-                {lastOrder.items.map((item) => (
+                {lastOrder.items.map((item, index) => (
                   <div
-                    key={item.id}
+                    key={`${item.id}-${index}`}
                     className="flex items-center justify-between py-1"
                   >
                     <div className="flex items-center gap-2.5">
@@ -179,9 +208,9 @@ export function HomeContent({ user, ordersContext }: HomeContentProps) {
               {/* Total line */}
               <div className="flex items-center justify-between py-3 border-t border-border/20">
                 <span className="text-sm font-semibold text-foreground">
-                  Order total
+                  Total
                 </span>
-                <span className="text-lg font-bold text-primary">
+                <span className="text-lg font-bold text-primary neon-text-readable">
                   ${lastOrderTotal.toFixed(2)}
                 </span>
               </div>
@@ -193,16 +222,15 @@ export function HomeContent({ user, ordersContext }: HomeContentProps) {
                   className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle flex-1 h-12 font-semibold text-base active-scale"
                 >
                   <Repeat className="w-4 h-4 mr-2" />
-                  Reorder now
+                  Reorder last order
                 </Button>
                 <Button
                   asChild
                   variant="outline"
-                  className="border-border/40 text-foreground hover:bg-secondary/50 flex-1 h-12 font-semibold text-base bg-transparent active-scale"
+                  className="border-border/40 text-foreground hover:bg-secondary/50 sm:flex-none h-12 px-5 font-medium text-sm bg-transparent active-scale"
                 >
-                  <Link href="/order">
-                    <span>Customize order</span>
-                    <ChevronRight className="w-4 h-4 ml-1" />
+                  <Link href="/profile">
+                    View order history
                   </Link>
                 </Button>
               </div>
