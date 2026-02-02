@@ -1,8 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { AlertCircle, Loader2, Mail, LogIn } from "lucide-react";
+import { AlertCircle, Loader2, Mail, LogIn, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useCart, useAuth } from "@/components/providers/app-provider";
 import { placeOrder } from "@/lib/api-client";
 import { toast } from "sonner";
@@ -15,6 +23,7 @@ export function CheckoutSection({ onClose }: CheckoutSectionProps) {
   const { items, clearCart } = useCart();
   const { session, login } = useAuth();
   const [isPlacing, setIsPlacing] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const isAuthenticated = session.isAuthenticated;
   const isVerified = session.user?.email_verified ?? false;
@@ -94,18 +103,54 @@ export function CheckoutSection({ onClose }: CheckoutSectionProps) {
   // Show login prompt if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="space-y-3">
-        <Button
-          onClick={login}
-          className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle font-semibold text-base transition-neon active-scale"
-        >
-          <LogIn className="w-4 h-4 mr-2" />
-          Log in to checkout
-        </Button>
-        <p className="text-xs text-muted-foreground text-center">
-          Create an account or log in to place your order
-        </p>
-      </div>
+      <>
+        <div className="space-y-3">
+          <Button
+            onClick={() => setShowLoginModal(true)}
+            disabled={items.length === 0}
+            className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle font-semibold text-base transition-neon active-scale disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Lock className="w-4 h-4 mr-2" />
+            Log in to place order
+          </Button>
+          <p className="text-xs text-muted-foreground text-center">
+            Browse the menu anytime. Log in to place orders.
+          </p>
+        </div>
+
+        {/* Login Modal */}
+        <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
+          <DialogContent className="glass border border-border/50">
+            <DialogHeader>
+              <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center mx-auto mb-3">
+                <Lock className="w-6 h-6 text-primary" />
+              </div>
+              <DialogTitle className="text-center text-xl">
+                Log in to place your order
+              </DialogTitle>
+              <DialogDescription className="text-center">
+                You can browse the menu anytime. To place orders and save order history, please log in.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex-col gap-2 sm:flex-col">
+              <Button
+                onClick={login}
+                className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle font-semibold"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                Log in
+              </Button>
+              <Button
+                onClick={() => setShowLoginModal(false)}
+                variant="outline"
+                className="w-full h-11 bg-transparent border-border/50 hover:bg-secondary/30 font-medium"
+              >
+                Continue browsing
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 
