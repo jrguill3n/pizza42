@@ -9,6 +9,7 @@ import { SegmentationPreviewCard } from "@/components/profile/segmentation-previ
 import { PasskeysRoadmapCallout } from "@/components/profile/passkeys-roadmap-callout";
 import type { Auth0User, OrdersContext } from "@/lib/auth0";
 import { getLoginUrl, getLogoutUrl, getSignupUrl } from "@/lib/auth0";
+import { t } from "@/lib/copy";
 
 interface ProfileContentProps {
   user: Auth0User | null;
@@ -25,24 +26,24 @@ export function ProfileContent({ user, ordersContext }: ProfileContentProps) {
             <User className="w-8 h-8 text-muted-foreground" />
           </div>
           <h1 className="text-xl font-bold text-foreground mb-2">
-            Sign in to view your profile
+            {t("profile_login_title")}
           </h1>
           <p className="text-muted-foreground text-sm mb-6">
-            Access your orders, settings, and more
+            {t("profile_login_subtitle")}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button
               asChild
               className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle"
             >
-              <a href={getLoginUrl("/profile")}>Log in</a>
+              <a href={getLoginUrl("/profile")}>{t("profile_login_cta")}</a>
             </Button>
             <Button
               asChild
               variant="outline"
               className="border-primary/40 text-primary hover:bg-primary hover:text-primary-foreground bg-transparent"
             >
-              <a href={getSignupUrl("/profile")}>Create account</a>
+              <a href={getSignupUrl("/profile")}>{t("profile_signup_cta")}</a>
             </Button>
           </div>
         </div>
@@ -52,19 +53,19 @@ export function ProfileContent({ user, ordersContext }: ProfileContentProps) {
 
   // Determine connection display name
   const connectionDisplay = user.sub?.startsWith("google-oauth2")
-    ? "Google"
+    ? t("profile_auth_google")
     : user.sub?.startsWith("auth0")
-      ? "Email & Password"
-      : "Social login";
+      ? t("profile_auth_email")
+      : t("profile_auth_social");
 
   return (
     <main className="container mx-auto px-4 md:px-6 py-6">
       {/* Page header */}
       <div className="mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-          Profile
+          {t("profile_title")}
         </h1>
-        <p className="text-muted-foreground">Manage your account and settings</p>
+        <p className="text-muted-foreground">{t("profile_subtitle")}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -77,9 +78,9 @@ export function ProfileContent({ user, ordersContext }: ProfileContentProps) {
                 <User className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-foreground">Account</h2>
+                <h2 className="text-lg font-semibold text-foreground">{t("profile_account")}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Your account details
+                  {t("profile_account_subtitle")}
                 </p>
               </div>
             </div>
@@ -89,17 +90,17 @@ export function ProfileContent({ user, ordersContext }: ProfileContentProps) {
               <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30">
                 <Mail className="w-5 h-5 text-muted-foreground" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-muted-foreground">Email</p>
+                  <p className="text-xs text-muted-foreground">{t("profile_email")}</p>
                   <p className="text-sm text-foreground truncate">{user.email}</p>
                 </div>
                 {user.email_verified ? (
                   <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-medium">
                     <CheckCircle className="w-3 h-3" />
-                    Verified
+                    {t("profile_email_verified")}
                   </div>
                 ) : (
                   <div className="px-2 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs font-medium">
-                    Unverified
+                    {t("profile_email_unverified")}
                   </div>
                 )}
               </div>
@@ -108,7 +109,7 @@ export function ProfileContent({ user, ordersContext }: ProfileContentProps) {
               <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30">
                 <Key className="w-5 h-5 text-muted-foreground" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-muted-foreground">Login method</p>
+                  <p className="text-xs text-muted-foreground">{t("profile_login_method")}</p>
                   <p className="text-sm text-foreground">{connectionDisplay}</p>
                 </div>
               </div>
@@ -118,12 +119,12 @@ export function ProfileContent({ user, ordersContext }: ProfileContentProps) {
                 <Shield className="w-5 h-5 text-muted-foreground" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-muted-foreground">
-                    Verification status
+                    {t("profile_verification_status")}
                   </p>
                   <p className="text-sm text-foreground">
                     {user.email_verified
-                      ? "Email verified"
-                      : "Pending verification"}
+                      ? t("profile_email_verified_status")
+                      : t("profile_pending_verification")}
                   </p>
                 </div>
               </div>
@@ -136,7 +137,7 @@ export function ProfileContent({ user, ordersContext }: ProfileContentProps) {
             >
               <a href={getLogoutUrl("/")}>
                 <LogOut className="w-4 h-4 mr-2" />
-                Log out
+                {t("profile_logout")}
               </a>
             </Button>
           </div>

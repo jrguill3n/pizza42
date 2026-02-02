@@ -115,14 +115,29 @@ export const copy = {
     
     // Perfil
     profile_title: "Perfil",
+    profile_subtitle: "Administra tu cuenta y configuración",
     profile_account: "Cuenta",
+    profile_account_subtitle: "Detalles de tu cuenta",
+    profile_email: "Correo electrónico",
     profile_email_verified: "Verificado",
     profile_email_unverified: "No verificado",
+    profile_login_method: "Método de inicio de sesión",
+    profile_verification_status: "Estado de verificación",
+    profile_email_verified_status: "Correo verificado",
+    profile_pending_verification: "Verificación pendiente",
+    profile_logout: "Cerrar sesión",
     profile_orders_title: "Historial de Pedidos",
     profile_orders_empty: "Aún no hay pedidos",
     profile_orders_empty_subtitle: "Tu historial de pedidos aparecerá aquí",
     profile_order_total: "Total",
     profile_order_items: "artículos",
+    profile_login_title: "Inicia sesión para ver tu perfil",
+    profile_login_subtitle: "Accede a tus pedidos, configuración y más.",
+    profile_login_cta: "Iniciar sesión",
+    profile_signup_cta: "Crear cuenta",
+    profile_auth_google: "Google",
+    profile_auth_email: "Correo y contraseña",
+    profile_auth_social: "Inicio de sesión social",
     
     // Segmentación
     segment_new_customer: "Nuevo Cliente",
@@ -137,6 +152,29 @@ export const copy = {
     segment_tooltip_title: "¿Por qué veo esto?",
     segment_tooltip_text: "Basado en tu historial de pedidos.",
   },
+};
+
+// Menu item name translations (keyed by SKU)
+export const MENU_NAME_ES: Record<string, string> = {
+  // Pizzas
+  p1: "Pepperoni Suprema",
+  p2: "Margherita Neón",
+  p3: "Pollo BBQ Cyber",
+  p4: "Veggie Matrix",
+  p5: "Cárnica Suprema",
+  p6: "Hawaiana Glitch",
+  
+  // Sides
+  s1: "Pan de Ajo",
+  s2: "Bocaditos de Queso",
+  s3: "Alitas x8",
+  s4: "Ensalada César",
+  
+  // Drinks
+  d1: "Cola Neón",
+  d2: "Agua Mineral",
+  d3: "Limonada",
+  d4: "Té Helado",
 };
 
 // Default locale

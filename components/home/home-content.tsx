@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
-import { Sparkles, ShoppingBag, Repeat, CheckCircle, Zap, Clock } from "lucide-react";
+import { Sparkles, ShoppingBag, Repeat, CheckCircle, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MenuItemCard } from "@/components/menu/menu-item-card";
 import { useCart } from "@/components/providers/app-provider";
@@ -228,14 +228,14 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
                   asChild
                   className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle h-12 px-6 font-semibold text-base active-scale"
                 >
-                  <Link href="/order">{t("home_guest_cta_primary")}</Link>
+                  <a href={getLoginUrl("/")}>{t("home_guest_cta_secondary")}</a>
                 </Button>
                 <Button
                   asChild
                   variant="outline"
                   className="border-primary/40 text-primary hover:bg-primary hover:text-primary-foreground h-12 px-6 font-semibold text-base bg-transparent active-scale"
                 >
-                  <a href={getLoginUrl("/")}>{t("home_guest_cta_secondary")}</a>
+                  <Link href="/order">{t("home_guest_cta_primary")}</Link>
                 </Button>
               </div>
               <div className="text-center sm:text-left">
