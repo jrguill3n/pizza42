@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import * as jose from "jose";
-import { auth0 } from "@/lib/auth0";
-import { getUser, updateUserMetadata } from "@/lib/auth0Management";
 
 export const runtime = "nodejs";
 
@@ -9,16 +7,18 @@ export const runtime = "nodejs";
 const ordersStore = new Map<string, Array<Order>>();
 
 interface OrderItem {
+  sku: string;
   name: string;
   qty: number;
-  price: number;
+  price_cents: number;
 }
 
 interface Order {
   id: string;
-  createdAt: string;
+  created_at: string;
   items: OrderItem[];
-  total: number;
+  total_cents: number;
+  note?: string;
 }
 
 // Cache JWKS for performance
@@ -98,7 +98,7 @@ export async function GET(request: Request) {
   // Get orders for user
   const orders = ordersStore.get(userId) || [];
 
-  return NextResponse.json({ orders });
+  return NextResponse.json({ ok: true, orders });
 }
 
 /**
@@ -135,18 +135,8 @@ export async function POST(request: Request) {
   // Get user ID from token
   const userId = payload.sub as string;
 
-  // Verify email is verified (server-side session check)
-  const session = await auth0.getSession();
-  if (!session || !session.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (session.user.email_verified !== true) {
-    return NextResponse.json({ error: "email_not_verified" }, { status: 403 });
-  }
-
   // Parse request body
-  let body: { items: OrderItem[] };
+  let body: { items: OrderItem[]; total_cents: number; note?: string };
   try {
     body = await request.json();
   } catch {
@@ -158,21 +148,28 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Items array is required" }, { status: 400 });
   }
 
+  if (typeof body.total_cents !== "number") {
+    return NextResponse.json({ error: "total_cents is required" }, { status: 400 });
+  }
+
   for (const item of body.items) {
-    if (!item.name || typeof item.qty !== "number" || typeof item.price !== "number") {
+    if (
+      !item.sku ||
+      !item.name ||
+      typeof item.qty !== "number" ||
+      typeof item.price_cents !== "number"
+    ) {
       return NextResponse.json({ error: "Invalid item format" }, { status: 400 });
     }
   }
 
-  // Calculate total
-  const total = body.items.reduce((sum, item) => sum + item.qty * item.price, 0);
-
   // Create order
   const order: Order = {
     id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    createdAt: new Date().toISOString(),
+    created_at: new Date().toISOString(),
     items: body.items,
-    total,
+    total_cents: body.total_cents,
+    note: body.note,
   };
 
   // Store order in memory
@@ -180,26 +177,5 @@ export async function POST(request: Request) {
   userOrders.push(order);
   ordersStore.set(userId, userOrders);
 
-  // Persist last 5 orders to user_metadata
-  try {
-    const user = await getUser(userId);
-    const existingOrders = (user.user_metadata?.orders as Order[]) || [];
-    
-    // Append new order and keep only last 5
-    const updatedOrders = [...existingOrders, order].slice(-5);
-    
-    await updateUserMetadata(userId, {
-      ...user.user_metadata,
-      orders: updatedOrders,
-    });
-
-    return NextResponse.json(
-      { ok: true, order, saved_orders_count: updatedOrders.length },
-      { status: 201 }
-    );
-  } catch (error) {
-    console.error("[v0] POST /api/orders: Failed to persist to metadata:", error);
-    // Still return success since order was created
-    return NextResponse.json({ ok: true, order }, { status: 201 });
-  }
+  return NextResponse.json({ ok: true, order }, { status: 201 });
 }
