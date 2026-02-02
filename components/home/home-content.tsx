@@ -379,31 +379,7 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
               </div>
             </div>
           </div>
-        ) : (
-          <div className="glass-elevated rounded-2xl p-5">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
-                <Clock className="w-6 h-6 text-primary" />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-base font-bold text-foreground mb-1">
-                  {t("home_guest_title")}
-                </h2>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                  {t("home_guest_subtitle")}
-                </p>
-                <Button
-                  asChild
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle h-11 px-5 font-semibold active-scale"
-                >
-                  <Link href="/order">
-                    {t("home_guest_cta")}
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        ) : null}
       </section>
 
       {/* Personalized Recommendations - Only for authenticated users with order history */}

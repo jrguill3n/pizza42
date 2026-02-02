@@ -105,8 +105,8 @@ export function Header() {
               </button>
             )}
 
-            {/* Auth */}
-            {session.isAuthenticated ? (
+            {/* Auth - only show when authenticated */}
+            {session.isAuthenticated && (
               <div className="flex items-center gap-2">
                 <Link
                   href="/profile"
@@ -138,24 +138,6 @@ export function Header() {
                   className="text-muted-foreground hover:text-foreground font-medium"
                 >
                   {t("nav_logout")}
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={login}
-                  className="text-foreground font-semibold"
-                >
-                  {t("nav_login")}
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={login}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle font-semibold"
-                >
-                  {t("nav_login")}
                 </Button>
               </div>
             )}
