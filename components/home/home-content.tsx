@@ -3,19 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
-import {
-  ChevronRight,
-  Sparkles,
-  ShoppingBag,
-  Repeat,
-  CheckCircle,
-  Zap,
-  Clock,
-} from "lucide-react";
+import { Sparkles, ShoppingBag, Repeat, CheckCircle, Zap, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MenuItemCard } from "@/components/menu/menu-item-card";
 import { useCart } from "@/components/providers/app-provider";
-import { mockMenuItems } from "@/lib/mock-data";
+import { mockMenuItems, type OrderItem } from "@/lib/mock-data";
 import { toast } from "sonner";
 import type { Auth0User, OrdersContext } from "@/lib/auth0";
 import { getLoginUrl, getSignupUrl, getLogoutUrl } from "@/lib/auth0";
@@ -39,7 +31,7 @@ interface OrderFromAPI {
 }
 
 export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeContentProps) {
-  const { addItem } = useCart();
+  const { addItem, setCartItems } = useCart(); // Import setCartItems from useCart
   const router = useRouter();
   const [ordersContext, setOrdersContext] = useState<OrdersContext | null>(initialOrdersContext);
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
@@ -161,23 +153,28 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
   const handleRepeatOrder = () => {
     if (!lastOrder?.items) return;
     
-    // Convert last order items to cart items with price_cents preserved
-    lastOrder.items.forEach((item) => {
-      // Use price_cents if available, otherwise convert price to cents
-      const price_cents = item.price_cents ?? Math.round(item.price * 100);
-      
-      addItem({
-        id: item.id,
-        name: item.name,
-        price: item.price,
-        price_cents: price_cents,
-        quantity: item.quantity,
-        category: item.category,
-      });
-    });
+    // Normalize last order items to canonical cart format
+    const normalized = lastOrder.items
+      .map((item) => {
+        // Skip items missing required fields
+        if (!item.id || !item.price_cents) {
+          return null;
+        }
+        
+        return {
+          sku: item.id, // Map id to sku
+          name: item.name,
+          quantity: Number(item.quantity ?? 1),
+          price_cents: Number(item.price_cents ?? 0),
+        };
+      })
+      .filter((item): item is OrderItem => item !== null);
     
-    toast.success("Added to cart", {
-      description: "Your last order is ready to checkout",
+    // Replace cart contents entirely (reorder = repeat order)
+    setCartItems(normalized);
+    
+    toast.success("Pedido agregado al carrito", {
+      description: "Tu último pedido está listo para ordenar",
     });
     // Navigate to order page so user can review and checkout
     router.push("/order");
@@ -203,7 +200,7 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
               <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
                 Pizza <span className="text-primary neon-text-readable">42</span>
               </h1>
-              <p className="text-sm text-muted-foreground">Neon fast delivery</p>
+              <p className="text-sm text-muted-foreground">Entrega Express</p>
             </div>
           </div>
 
@@ -219,7 +216,7 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
             </>
           ) : (
             <p className="text-lg md:text-xl text-foreground/90 font-medium mb-6 max-w-sm leading-relaxed">
-              Fresh pizza, crafted fast. Order in seconds.
+              Pizza fresca, preparada al momento. Ordena en segundos.
             </p>
           )}
 
@@ -377,38 +374,12 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
                 >
                   <Link href="/order">
                     {t("home_first_order_cta")}
-                    <ChevronRight className="w-4 h-4 ml-1" />
                   </Link>
                 </Button>
               </div>
             </div>
           </div>
-        ) : (
-          <div className="glass-elevated rounded-2xl p-5">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
-                <Clock className="w-6 h-6 text-primary" />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-base font-bold text-foreground mb-1">
-                  {t("home_guest_title")}
-                </h2>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                  {t("home_guest_subtitle")}
-                </p>
-                <Button
-                  asChild
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle h-11 px-5 font-semibold active-scale"
-                >
-                  <Link href="/order">
-                    {t("home_guest_cta")}
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        ) : null}
       </section>
 
       {/* Personalized Recommendations - Only for authenticated users with order history */}

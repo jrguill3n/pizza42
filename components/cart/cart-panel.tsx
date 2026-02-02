@@ -45,41 +45,45 @@ export function CartPanel() {
           </div>
         ) : (
           <div className="space-y-3">
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-start gap-3 p-3 rounded-xl bg-secondary/20 border border-border/10 transition-colors hover:bg-secondary/30"
-              >
-                {/* Item icon */}
-                <div className="w-12 h-12 rounded-xl bg-secondary/40 flex items-center justify-center shrink-0">
-                  <span className="text-base font-bold text-primary/70">
-                    {item.category === "pizza" ? "P" : item.category === "sides" ? "S" : "D"}
-                  </span>
-                </div>
-
-                {/* Item details */}
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-foreground text-sm leading-tight">{item.name}</h4>
-                  <p className="text-primary font-bold text-sm mt-0.5">
-                    ${(item.price * item.quantity).toFixed(2)}
-                  </p>
-
-                  {/* Quantity controls */}
-                  <div className="flex items-center gap-1 mt-2 bg-secondary/30 rounded-lg p-0.5 w-fit">
-                    <Button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      size="icon"
-                      variant="ghost"
-                      className="h-7 w-7 text-foreground hover:bg-secondary/50 rounded-md"
-                      aria-label={`Decrease ${item.name} quantity`}
-                    >
-                      <Minus className="w-3 h-3" />
-                    </Button>
-                    <span className="w-6 text-center font-bold text-foreground text-sm tabular-nums">
-                      {item.quantity}
+            {items.map((item) => {
+              const itemId = item.sku || item.id;
+              const itemPrice = ((item.price_cents ?? 0) * item.quantity) / 100;
+              
+              return (
+                <div
+                  key={itemId}
+                  className="flex items-start gap-3 p-3 rounded-xl bg-secondary/20 border border-border/10 transition-colors hover:bg-secondary/30"
+                >
+                  {/* Item icon */}
+                  <div className="w-12 h-12 rounded-xl bg-secondary/40 flex items-center justify-center shrink-0">
+                    <span className="text-base font-bold text-primary/70">
+                      {item.category === "pizza" ? "P" : item.category === "sides" ? "S" : "D"}
                     </span>
+                  </div>
+
+                  {/* Item details */}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-foreground text-sm leading-tight">{item.name}</h4>
+                    <p className="text-primary font-bold text-sm mt-0.5">
+                      ${itemPrice.toFixed(2)}
+                    </p>
+
+                    {/* Quantity controls */}
+                    <div className="flex items-center gap-1 mt-2 bg-secondary/30 rounded-lg p-0.5 w-fit">
+                      <Button
+                        onClick={() => updateQuantity(itemId, item.quantity - 1)}
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-foreground hover:bg-secondary/50 rounded-md"
+                        aria-label={`Decrease ${item.name} quantity`}
+                      >
+                        <Minus className="w-3 h-3" />
+                      </Button>
+                      <span className="w-6 text-center font-bold text-foreground text-sm tabular-nums">
+                        {item.quantity}
+                      </span>
                     <Button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => updateQuantity(itemId, item.quantity + 1)}
                       size="icon"
                       variant="ghost"
                       className="h-7 w-7 text-foreground hover:bg-secondary/50 rounded-md"
@@ -92,16 +96,17 @@ export function CartPanel() {
 
                 {/* Remove button */}
                 <Button
-                  onClick={() => handleRemove(item.id, item.name)}
-                  size="icon"
-                  variant="ghost"
-                  className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0 rounded-lg"
-                  aria-label={`Remove ${item.name} from cart`}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
+                  onClick={() => handleRemove(itemId, item.name)}
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0 rounded-lg"
+                    aria-label={`Remove ${item.name} from cart`}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

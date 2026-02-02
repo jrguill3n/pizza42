@@ -22,21 +22,19 @@ interface MenuItemCardProps {
 
 export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
   const { items, addItem, updateQuantity } = useCart();
-  const cartItem = items.find((i) => i.id === item.id);
+  const cartItem = items.find((i) => (i.sku || i.id) === item.id);
   const quantity = cartItem?.quantity ?? 0;
   const [imageError, setImageError] = useState(false);
 
   const handleAdd = () => {
     addItem({
-      id: item.id,
+      sku: item.id, // Use sku as canonical field
       name: item.name,
-      price: item.price,
-      price_cents: Math.round(item.price * 100), // Store cents for accurate calculations
+      price_cents: Math.round(item.price * 100),
       quantity: 1,
-      category: item.category,
     });
-    toast.success(`${item.name} added`, {
-      description: `$${item.price.toFixed(2)} each`,
+    toast.success(`${item.name} agregado`, {
+      description: `$${item.price.toFixed(2)} cada uno`,
     });
   };
 
@@ -46,7 +44,7 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
 
   const handleDecrement = () => {
     if (quantity === 1) {
-      toast.info(`${item.name} removed`);
+      toast.info(`${item.name} eliminado`);
     }
     updateQuantity(item.id, quantity - 1);
   };

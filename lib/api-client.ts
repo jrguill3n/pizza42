@@ -76,13 +76,22 @@ export async function placeOrder(
       return { success: false, error: "Not authenticated", code: "not_authenticated" };
     }
     
-    // Transform cart items to API format
-    const apiItems = items.map(item => ({
-      sku: item.id,
-      name: item.name,
-      qty: item.quantity,
-      price_cents: Math.round(item.price * 100), // Convert dollars to cents
-    }));
+    // Transform cart items to API format (use canonical fields)
+    const apiItems = items.map(item => {
+      const sku = item.sku || item.id;
+      const price_cents = item.price_cents ?? 0;
+      
+      if (!sku || !price_cents) {
+        return null;
+      }
+      
+      return {
+        sku,
+        name: item.name,
+        qty: item.quantity,
+        price_cents,
+      };
+    }).filter((item): item is NonNullable<typeof item> => item !== null);
     
     // Calculate total_cents from items
     const total_cents = apiItems.reduce(

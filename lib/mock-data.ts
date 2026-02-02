@@ -18,12 +18,14 @@ export interface Session {
 }
 
 export interface OrderItem {
-  id: string;
+  sku: string;
   name: string;
-  price: number; // Price in dollars (for menu display)
-  price_cents?: number; // Price in cents (for cart calculations)
+  price_cents: number; // Price in cents (canonical for cart)
   quantity: number;
-  category: 'pizza' | 'sides' | 'drinks';
+  // Legacy fields for compatibility
+  id?: string;
+  price?: number;
+  category?: 'pizza' | 'sides' | 'drinks';
 }
 
 export interface Order {
