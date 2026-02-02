@@ -203,7 +203,7 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
               <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
                 Pizza <span className="text-primary neon-text-readable">42</span>
               </h1>
-              <p className="text-sm text-muted-foreground">Neon fast delivery</p>
+              <p className="text-sm text-muted-foreground">Entrega Express</p>
             </div>
           </div>
 
@@ -219,7 +219,7 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
             </>
           ) : (
             <p className="text-lg md:text-xl text-foreground/90 font-medium mb-6 max-w-sm leading-relaxed">
-              Fresh pizza, crafted fast. Order in seconds.
+              Pizza fresca, preparada al momento. Ordena en segundos.
             </p>
           )}
 
