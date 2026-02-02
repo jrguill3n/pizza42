@@ -188,32 +188,48 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
             </div>
           </div>
 
-          <p className="text-lg md:text-xl text-foreground/90 font-medium mb-6 max-w-sm leading-relaxed">
-            Fresh pizza, crafted fast. Order in seconds.
-          </p>
+          {/* Hero text changes based on auth state */}
+          {!isAuthenticated ? (
+            <>
+              <h2 className="text-lg md:text-xl text-foreground font-semibold mb-2 leading-relaxed">
+                {t("home_guest_title")}
+              </h2>
+              <p className="text-sm md:text-base text-muted-foreground mb-6 max-w-md leading-relaxed">
+                {t("home_guest_subtitle")}
+              </p>
+            </>
+          ) : (
+            <p className="text-lg md:text-xl text-foreground/90 font-medium mb-6 max-w-sm leading-relaxed">
+              Fresh pizza, crafted fast. Order in seconds.
+            </p>
+          )}
 
           {/* Auth State Area */}
           {!isAuthenticated ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button
                   asChild
                   className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle h-12 px-6 font-semibold text-base active-scale"
                 >
-                  <a href={getLoginUrl("/")}>{t("nav_login")}</a>
+                  <Link href="/order">{t("home_guest_cta_primary")}</Link>
                 </Button>
                 <Button
                   asChild
                   variant="outline"
                   className="border-primary/40 text-primary hover:bg-primary hover:text-primary-foreground h-12 px-6 font-semibold text-base bg-transparent active-scale"
                 >
-                  <a href={getSignupUrl("/")}>{t("nav_login")}</a>
+                  <a href={getLoginUrl("/")}>{t("home_guest_cta_secondary")}</a>
                 </Button>
               </div>
-              <p className="text-sm text-muted-foreground flex items-center gap-2">
-                <Zap className="w-4 h-4 text-primary" />
-                {t("home_guest_subtitle")}
-              </p>
+              <div className="text-center sm:text-left">
+                <a
+                  href={getSignupUrl("/")}
+                  className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4 transition-colors"
+                >
+                  {t("home_guest_cta_signup")}
+                </a>
+              </div>
             </div>
           ) : (
             <div className="flex items-center gap-3 flex-wrap">
