@@ -2,21 +2,32 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShoppingCart, User } from "lucide-react";
+import { useState } from "react";
+import { ShoppingCart, User, Lock, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart, useAuth } from "@/components/providers/app-provider";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { t } from "@/lib/copy";
 
 const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/order", label: "Menu" },
-  { href: "/profile", label: "Profile" },
+  { href: "/", label: "nav_home" as const },
+  { href: "/order", label: "nav_menu" as const },
+  { href: "/profile", label: "nav_profile" as const },
 ];
 
 export function Header() {
   const pathname = usePathname();
   const { itemCount, total } = useCart();
   const { session, login, logout } = useAuth();
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   return (
     <header className="hidden md:block sticky top-0 z-50 w-full">
@@ -45,7 +56,7 @@ export function Header() {
                     : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
                 )}
               >
-                {link.label}
+                {t(link.label)}
               </Link>
             ))}
           </nav>
@@ -53,23 +64,46 @@ export function Header() {
           {/* Right side */}
           <div className="flex items-center gap-3">
             {/* Cart indicator */}
-            <Link
-              href="/order"
-              className={cn(
-                "relative flex items-center gap-2 px-3 py-2 rounded-xl transition-neon",
-                itemCount > 0 ? "bg-primary/15 hover:bg-primary/20" : "hover:bg-secondary/40"
-              )}
-            >
-              <ShoppingCart className={cn("w-5 h-5", itemCount > 0 ? "text-primary" : "text-foreground")} />
-              {itemCount > 0 && (
-                <>
-                  <span className="text-sm font-bold text-primary tabular-nums">${total.toFixed(0)}</span>
-                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
-                    {itemCount > 9 ? "9+" : itemCount}
-                  </span>
-                </>
-              )}
-            </Link>
+            {session.isAuthenticated ? (
+              <Link
+                href="/order"
+                className={cn(
+                  "relative flex items-center gap-2 px-3 py-2 rounded-xl transition-neon",
+                  itemCount > 0 ? "bg-primary/15 hover:bg-primary/20" : "hover:bg-secondary/40"
+                )}
+              >
+                <ShoppingCart className={cn("w-5 h-5", itemCount > 0 ? "text-primary" : "text-foreground")} />
+                {itemCount > 0 && (
+                  <>
+                    <span className="text-sm font-bold text-primary tabular-nums">${total.toFixed(0)}</span>
+                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
+                      {itemCount > 9 ? "9+" : itemCount}
+                    </span>
+                  </>
+                )}
+              </Link>
+            ) : (
+              <button
+                onClick={() => setShowLoginModal(true)}
+                className={cn(
+                  "relative flex items-center gap-2 px-3 py-2 rounded-xl transition-neon",
+                  itemCount > 0 ? "bg-primary/15 hover:bg-primary/20" : "hover:bg-secondary/40"
+                )}
+              >
+                <ShoppingCart className={cn("w-5 h-5", itemCount > 0 ? "text-primary" : "text-foreground")} />
+                {itemCount > 0 && (
+                  <>
+                    <span className="text-sm font-bold text-primary tabular-nums">${total.toFixed(0)}</span>
+                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
+                      {itemCount > 9 ? "9+" : itemCount}
+                    </span>
+                  </>
+                )}
+                <span className="absolute -bottom-0.5 -left-0.5 w-4 h-4 rounded-full bg-background flex items-center justify-center">
+                  <Lock className="w-2.5 h-2.5 text-primary" />
+                </span>
+              </button>
+            )}
 
             {/* Auth */}
             {session.isAuthenticated ? (
@@ -103,7 +137,7 @@ export function Header() {
                   onClick={logout}
                   className="text-muted-foreground hover:text-foreground font-medium"
                 >
-                  Log out
+                  {t("nav_logout")}
                 </Button>
               </div>
             ) : (
@@ -114,20 +148,53 @@ export function Header() {
                   onClick={login}
                   className="text-foreground font-semibold"
                 >
-                  Log in
+                  {t("nav_login")}
                 </Button>
                 <Button
                   size="sm"
                   onClick={login}
                   className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle font-semibold"
                 >
-                  Sign up
+                  {t("nav_login")}
                 </Button>
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* Login Modal */}
+      <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
+        <DialogContent className="glass border border-border/50">
+          <DialogHeader>
+            <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center mx-auto mb-3">
+              <Lock className="w-6 h-6 text-primary" />
+            </div>
+            <DialogTitle className="text-center text-xl">
+              {t("cart_auth_required_title")}
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              {t("cart_auth_required_message")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-col gap-2 sm:flex-col">
+            <Button
+              onClick={login}
+              className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle font-semibold"
+            >
+              <LogIn className="w-4 h-4 mr-2" />
+              {t("nav_login")}
+            </Button>
+            <Button
+              onClick={() => setShowLoginModal(false)}
+              variant="outline"
+              className="w-full h-11 bg-transparent border-border/50 hover:bg-secondary/30 font-medium"
+            >
+              {t("cart_continue_browsing")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }

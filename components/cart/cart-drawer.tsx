@@ -1,16 +1,27 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { ShoppingCart, X, Plus, Minus, Trash2, ChevronUp } from "lucide-react";
+import { ShoppingCart, X, Plus, Minus, Trash2, ChevronUp, Lock, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useCart } from "@/components/providers/app-provider";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useCart, useAuth } from "@/components/providers/app-provider";
 import { CheckoutSection } from "./checkout-section";
 import { toast } from "sonner";
+import { t } from "@/lib/copy";
 
 export function CartDrawer() {
   const [isOpen, setIsOpen] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const { items, updateQuantity, removeItem, subtotal, total, itemCount } = useCart();
+  const { session, login } = useAuth();
 
   const handleRemove = useCallback((itemId: string, itemName: string) => {
     removeItem(itemId);
@@ -38,11 +49,19 @@ export function CartDrawer() {
     return () => { document.body.style.overflow = ""; };
   }, [isOpen]);
 
+  const handleCartClick = () => {
+    if (!session.isAuthenticated) {
+      setShowLoginModal(true);
+    } else {
+      setIsOpen(true);
+    }
+  };
+
   return (
     <>
       {/* Floating cart button - positioned above bottom nav */}
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={handleCartClick}
         aria-label={`Open cart with ${itemCount} items`}
         className={cn(
           "fixed bottom-24 right-4 z-40 md:hidden",
@@ -58,6 +77,11 @@ export function CartDrawer() {
         <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center">
           {itemCount}
         </span>
+        {!session.isAuthenticated && (
+          <span className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-background flex items-center justify-center">
+            <Lock className="w-3 h-3 text-primary" />
+          </span>
+        )}
       </button>
 
       {/* Backdrop */}
@@ -218,6 +242,39 @@ export function CartDrawer() {
           )}
         </div>
       </div>
+
+      {/* Login Modal */}
+      <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
+        <DialogContent className="glass border border-border/50">
+          <DialogHeader>
+            <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center mx-auto mb-3">
+              <Lock className="w-6 h-6 text-primary" />
+            </div>
+            <DialogTitle className="text-center text-xl">
+              {t("cart_auth_required_title")}
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              {t("cart_auth_required_message")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-col gap-2 sm:flex-col">
+            <Button
+              onClick={login}
+              className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle font-semibold"
+            >
+              <LogIn className="w-4 h-4 mr-2" />
+              {t("nav_login")}
+            </Button>
+            <Button
+              onClick={() => setShowLoginModal(false)}
+              variant="outline"
+              className="w-full h-11 bg-transparent border-border/50 hover:bg-secondary/30 font-medium"
+            >
+              {t("cart_continue_browsing")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

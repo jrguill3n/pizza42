@@ -5,11 +5,12 @@ import { usePathname } from "next/navigation";
 import { Home, ShoppingBag, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/components/providers/app-provider";
+import { t } from "@/lib/copy";
 
 const navItems = [
-  { href: "/", label: "Home", icon: Home },
-  { href: "/order", label: "Order", icon: ShoppingBag },
-  { href: "/profile", label: "Profile", icon: User },
+  { href: "/", label: "nav_home" as const, icon: Home },
+  { href: "/order", label: "nav_menu" as const, icon: ShoppingBag },
+  { href: "/profile", label: "nav_profile" as const, icon: User },
 ];
 
 export function BottomNav() {
@@ -77,7 +78,7 @@ export function BottomNav() {
                     isActive && "neon-text-readable"
                   )}
                 >
-                  {item.label}
+                  {t(item.label)}
                 </span>
               </Link>
             );
