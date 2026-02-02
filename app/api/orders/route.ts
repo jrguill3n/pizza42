@@ -132,6 +132,24 @@ export async function POST(request: Request) {
     );
   }
 
+  // Check email verification from namespaced claim
+  const NS = "https://pizza42.example/orders_context";
+  const ordersContext = payload[NS];
+
+  if (!ordersContext) {
+    return NextResponse.json(
+      {
+        error: "email_verification_unknown",
+        hint: "Add NS claim to access token",
+      },
+      { status: 403 }
+    );
+  }
+
+  if (ordersContext.email_verified === false) {
+    return NextResponse.json({ error: "email_not_verified" }, { status: 403 });
+  }
+
   // Get user ID from token
   const userId = payload.sub as string;
 

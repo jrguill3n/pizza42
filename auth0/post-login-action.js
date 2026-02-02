@@ -107,12 +107,17 @@ exports.onExecutePostLogin = async (event, api) => {
       : null;
     const last3Orders = orders.slice(-3).reverse(); // Most recent first
 
-    // Set custom claim on ID token
-    api.idToken.setCustomClaim(namespace, {
+    // Build custom claim payload
+    const claimPayload = {
       orders_count: ordersCount,
       last_order_at: lastOrderAt,
       last_3_orders: last3Orders,
-    });
+      email_verified: event.user.email_verified || false,
+    };
+
+    // Set custom claim on both ID token and access token
+    api.idToken.setCustomClaim(namespace, claimPayload);
+    api.accessToken.setCustomClaim(namespace, claimPayload);
 
     console.log(`[Pizza42] Added orders context: ${ordersCount} orders`);
   } catch (error) {
