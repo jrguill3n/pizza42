@@ -83,19 +83,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
       
       if (res.ok) {
         const data = await res.json();
-        console.log("[v0] Session fetched:", data);
-        // Map API response (authenticated) to internal format (isAuthenticated)
         setSession({
           isAuthenticated: data.authenticated || false,
           user: data.user || null,
           claims: data.claims || undefined,
         });
       } else {
-        console.log("[v0] Session fetch failed, not authenticated");
         setSession({ isAuthenticated: false, user: null });
       }
-    } catch (error) {
-      console.error("[v0] Failed to fetch session:", error);
+    } catch {
       setSession({ isAuthenticated: false, user: null });
     }
   }, []);
