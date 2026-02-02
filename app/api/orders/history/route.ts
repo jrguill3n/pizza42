@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth0Management.server";
 import { verifyAccessToken, requireScope, getUserId } from "@/lib/auth.server";
-import { verifyToken, checkPermission } from "@/lib/auth.server"; // Declare the missing variables
 
 export const runtime = "nodejs";
 

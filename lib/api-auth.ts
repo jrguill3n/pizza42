@@ -1,4 +1,5 @@
-import { auth0 } from "./auth0";
+import "server-only";
+import { auth0 } from "./auth0.server";
 
 /**
  * Get session user info
