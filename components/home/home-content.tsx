@@ -13,22 +13,19 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MenuItemCard } from "@/components/menu/menu-item-card";
-import { useCart } from "@/components/providers/app-provider";
+import { useCart, useAuth } from "@/components/providers/app-provider";
 import { featuredItems } from "@/lib/mock-data";
 import { toast } from "sonner";
-import type { Auth0User, OrdersContext } from "@/lib/auth0";
 import { getLoginUrl, getSignupUrl, getLogoutUrl } from "@/lib/auth0";
 
-interface HomeContentProps {
-  user: Auth0User | null;
-  ordersContext: OrdersContext | null;
-}
-
-export function HomeContent({ user, ordersContext }: HomeContentProps) {
+export function HomeContent() {
   const { addItem } = useCart();
+  const { session } = useAuth();
   const router = useRouter();
 
-  const isAuthenticated = !!user;
+  const isAuthenticated = session.isAuthenticated;
+  const user = session.user;
+  const ordersContext = session.claims;
   const hasOrders = ordersContext && ordersContext.orders_count > 0;
   const lastOrder = ordersContext?.last_order;
 

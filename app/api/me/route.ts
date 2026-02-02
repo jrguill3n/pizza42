@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth0 } from "@/lib/auth0";
+import { auth0, getOrdersContextFromSession } from "@/lib/auth0";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
  * GET /api/me
- * Returns current user info from session
+ * Returns current user info from session with orders context claims
  */
 export async function GET(request: NextRequest) {
   const session = await auth0.getSession(request);
@@ -17,6 +17,9 @@ export async function GET(request: NextRequest) {
     });
   }
 
+  // Get orders context from session (namespaced claims)
+  const ordersContext = getOrdersContextFromSession(session);
+
   return NextResponse.json({
     authenticated: true,
     user: {
@@ -25,6 +28,8 @@ export async function GET(request: NextRequest) {
       given_name: session.user.given_name,
       family_name: session.user.family_name,
       picture: session.user.picture,
+      email_verified: session.user.email_verified,
     },
+    claims: ordersContext || undefined,
   });
 }

@@ -4,7 +4,6 @@ import { createContext, useContext, useState, useCallback, useEffect, type React
 import type { OrderItem } from "@/lib/mock-data";
 
 interface User {
-  sub: string;
   email?: string;
   email_verified?: boolean;
   name?: string;
@@ -13,9 +12,26 @@ interface User {
   picture?: string;
 }
 
+interface OrdersContext {
+  orders_count: number;
+  last_order_at: string | null;
+  last_order?: {
+    id: string;
+    items: Array<{
+      id: string;
+      name: string;
+      price: number;
+      quantity: number;
+      category: "pizza" | "sides" | "drinks";
+    }>;
+    total: number;
+  } | null;
+}
+
 interface Session {
   isAuthenticated: boolean;
   user: User | null;
+  claims?: OrdersContext;
 }
 
 interface CartContextType {
@@ -72,6 +88,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setSession({
           isAuthenticated: data.authenticated || false,
           user: data.user || null,
+          claims: data.claims || undefined,
         });
       } else {
         console.log("[v0] Session fetch failed, not authenticated");

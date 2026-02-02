@@ -61,6 +61,14 @@ export function getOrdersContext(user: Auth0User | null): OrdersContext | null {
 }
 
 /**
+ * Extract orders context from session
+ */
+export function getOrdersContextFromSession(session: any): OrdersContext | null {
+  if (!session?.user) return null;
+  return (session.user as Auth0User)[ORDERS_CONTEXT_CLAIM] ?? null;
+}
+
+/**
  * Generate login URL with optional returnTo path
  */
 export function getLoginUrl(returnTo?: string): string {
