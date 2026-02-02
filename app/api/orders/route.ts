@@ -25,21 +25,28 @@ let jwksCache: jose.JWTVerifyGetKey | null = null;
 
 async function getJWKS(): Promise<jose.JWTVerifyGetKey> {
   if (!jwksCache) {
-    const issuer = process.env.AUTH0_ISSUER_BASE_URL!;
-    const jwksUrl = new URL(`${issuer.replace(/\/$/, "")}/.well-known/jwks.json`);
+    const issuerRaw = process.env.AUTH0_ISSUER_BASE_URL!;
+    const issuerNoSlash = issuerRaw.replace(/\/$/, "");
+    const jwksUrl = new URL(`${issuerNoSlash}/.well-known/jwks.json`);
     jwksCache = jose.createRemoteJWKSet(jwksUrl);
   }
   return jwksCache;
 }
 
 async function verifyToken(token: string) {
-  const issuer = process.env.AUTH0_ISSUER_BASE_URL!;
-  const audience = process.env.AUTH0_AUDIENCE!;
+  const issuerRaw = process.env.AUTH0_ISSUER_BASE_URL!;
+  const issuerNoSlash = issuerRaw.replace(/\/$/, "");
+  const allowedIssuers = [issuerNoSlash, `${issuerNoSlash}/`];
+
+  const audRaw = process.env.AUTH0_AUDIENCE!;
+  const audNoSlash = audRaw.replace(/\/$/, "");
+  const allowedAud = [audNoSlash, `${audNoSlash}/`];
+
   const JWKS = await getJWKS();
 
   const { payload } = await jose.jwtVerify(token, JWKS, {
-    issuer: issuer,
-    audience: audience,
+    issuer: allowedIssuers,
+    audience: allowedAud,
   });
 
   return payload;
@@ -78,7 +85,14 @@ export async function GET(request: Request) {
   } catch (error: any) {
     console.error("[v0] GET /api/orders: JWT verification failed:", error);
     return NextResponse.json(
-      { error: "invalid_token", detail: error.code || error.message || "verify_failed" },
+      {
+        error: "invalid_token",
+        detail: {
+          code: error.code || "unknown",
+          claim: error.claim || undefined,
+          reason: error.reason || error.message || "verify_failed",
+        },
+      },
       { status: 401 }
     );
   }
@@ -129,7 +143,14 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error("[v0] POST /api/orders: JWT verification failed:", error);
     return NextResponse.json(
-      { error: "invalid_token", detail: error.code || error.message || "verify_failed" },
+      {
+        error: "invalid_token",
+        detail: {
+          code: error.code || "unknown",
+          claim: error.claim || undefined,
+          reason: error.reason || error.message || "verify_failed",
+        },
+      },
       { status: 401 }
     );
   }
