@@ -15,7 +15,7 @@ export const ORDERS_CONTEXT_CLAIM = "https://pizza42.example/orders_context";
 export interface OrdersContext {
   orders_count: number;
   last_order_at: string | null;
-  last_order?: {
+  last_3_orders?: Array<{
     id: string;
     items: Array<{
       id: string;
@@ -25,7 +25,7 @@ export interface OrdersContext {
       category: "pizza" | "sides" | "drinks";
     }>;
     total: number;
-  } | null;
+  }> | null;
 }
 
 export interface Auth0User {

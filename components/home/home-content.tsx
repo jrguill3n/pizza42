@@ -78,17 +78,17 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
             setOrdersContext({
               orders_count: orders.length,
               last_order_at: lastOrder.created_at,
-              last_order: {
-                id: lastOrder.id,
-                items: lastOrder.items.map(item => ({
+              last_3_orders: orders.slice(0, 3).map(order => ({
+                id: order.id,
+                items: order.items.map(item => ({
                   id: item.sku,
                   name: item.name,
                   price: item.price_cents / 100,
                   quantity: item.qty,
                   category: "pizza" as const,
                 })),
-                total: lastOrder.total_cents / 100,
-              },
+                total: order.total_cents / 100,
+              })),
             });
           }
         }
@@ -102,8 +102,9 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
     fetchOrders();
   }, [isAuthenticated, ordersContext]);
 
-  const hasOrders = ordersContext && ordersContext.orders_count > 0;
-  const lastOrder = ordersContext?.last_order;
+  const ordersCount = Number(ordersContext?.orders_count ?? 0);
+  const lastOrder = ordersContext?.last_3_orders?.[0] ?? null;
+  const hasOrders = ordersCount > 0 && lastOrder !== null;
 
   // Calculate last order total
   const lastOrderTotal = lastOrder?.total ?? 0;
@@ -225,7 +226,7 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
           <div className="mt-6 pt-4 border-t border-border/20">
             <p className="text-xs text-muted-foreground/60 font-mono space-y-0.5">
               <span className="block">auth: {isAuthenticated ? "yes" : "no"}</span>
-              <span className="block">orders_count: {ordersContext?.orders_count ?? 0}</span>
+              <span className="block">orders_count: {ordersCount}</span>
               <span className="block">lastOrder: {lastOrder ? "yes" : "no"}</span>
             </p>
           </div>
