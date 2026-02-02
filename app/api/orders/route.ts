@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import * as jose from "jose";
 import { auth0 } from "@/lib/auth0";
+import { getUser, updateUserMetadata } from "@/lib/auth0Management";
 
 export const runtime = "nodejs";
 
@@ -174,10 +175,31 @@ export async function POST(request: Request) {
     total,
   };
 
-  // Store order
+  // Store order in memory
   const userOrders = ordersStore.get(userId) || [];
   userOrders.push(order);
   ordersStore.set(userId, userOrders);
 
-  return NextResponse.json({ ok: true, order }, { status: 201 });
+  // Persist last 5 orders to user_metadata
+  try {
+    const user = await getUser(userId);
+    const existingOrders = (user.user_metadata?.orders as Order[]) || [];
+    
+    // Append new order and keep only last 5
+    const updatedOrders = [...existingOrders, order].slice(-5);
+    
+    await updateUserMetadata(userId, {
+      ...user.user_metadata,
+      orders: updatedOrders,
+    });
+
+    return NextResponse.json(
+      { ok: true, order, saved_orders_count: updatedOrders.length },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("[v0] POST /api/orders: Failed to persist to metadata:", error);
+    // Still return success since order was created
+    return NextResponse.json({ ok: true, order }, { status: 201 });
+  }
 }
