@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/providers/app-provider";
 import type { MenuItem } from "@/lib/mock-data";
 import { toast } from "sonner";
+import { t } from "@/lib/copy";
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -71,7 +72,7 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
               className="w-full h-10 bg-primary/15 text-primary hover:bg-primary hover:text-primary-foreground transition-neon active-scale font-semibold"
             >
               <Plus className="w-4 h-4 mr-1.5" />
-              Add
+              {t("menu_add_to_cart")}
             </Button>
           ) : (
             <div className="flex items-center justify-between gap-2 bg-secondary/30 rounded-xl p-1">

@@ -6,11 +6,12 @@ import { ShoppingCart, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart, useAuth } from "@/components/providers/app-provider";
 import { Button } from "@/components/ui/button";
+import { t } from "@/lib/copy";
 
 const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/order", label: "Menu" },
-  { href: "/profile", label: "Profile" },
+  { href: "/", label: "nav_home" as const },
+  { href: "/order", label: "nav_menu" as const },
+  { href: "/profile", label: "nav_profile" as const },
 ];
 
 export function Header() {
@@ -45,7 +46,7 @@ export function Header() {
                     : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
                 )}
               >
-                {link.label}
+                {t(link.label)}
               </Link>
             ))}
           </nav>
@@ -103,7 +104,7 @@ export function Header() {
                   onClick={logout}
                   className="text-muted-foreground hover:text-foreground font-medium"
                 >
-                  Log out
+                  {t("nav_logout")}
                 </Button>
               </div>
             ) : (
@@ -114,14 +115,14 @@ export function Header() {
                   onClick={login}
                   className="text-foreground font-semibold"
                 >
-                  Log in
+                  {t("nav_login")}
                 </Button>
                 <Button
                   size="sm"
                   onClick={login}
                   className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle font-semibold"
                 >
-                  Sign up
+                  {t("nav_login")}
                 </Button>
               </div>
             )}

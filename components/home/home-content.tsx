@@ -19,6 +19,7 @@ import { featuredItems } from "@/lib/mock-data";
 import { toast } from "sonner";
 import type { Auth0User, OrdersContext } from "@/lib/auth0";
 import { getLoginUrl, getSignupUrl, getLogoutUrl } from "@/lib/auth0";
+import { t } from "@/lib/copy";
 
 interface HomeContentProps {
   user: Auth0User | null;
@@ -125,8 +126,8 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
     const yesterday = new Date(now);
     yesterday.setDate(now.getDate() - 1);
 
-    if (isSameDay) return "Today";
-    if (d.toDateString() === yesterday.toDateString()) return "Yesterday";
+    if (isSameDay) return t("home_date_today");
+    if (d.toDateString() === yesterday.toDateString()) return t("home_date_yesterday");
 
     return d.toLocaleDateString(undefined, {
       month: "short",
@@ -192,19 +193,19 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
                   asChild
                   className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle h-12 px-6 font-semibold text-base active-scale"
                 >
-                  <a href={getLoginUrl("/")}>Log in</a>
+                  <a href={getLoginUrl("/")}>{t("nav_login")}</a>
                 </Button>
                 <Button
                   asChild
                   variant="outline"
                   className="border-primary/40 text-primary hover:bg-primary hover:text-primary-foreground h-12 px-6 font-semibold text-base bg-transparent active-scale"
                 >
-                  <a href={getSignupUrl("/")}>Create account</a>
+                  <a href={getSignupUrl("/")}>{t("nav_login")}</a>
                 </Button>
               </div>
               <p className="text-sm text-muted-foreground flex items-center gap-2">
                 <Zap className="w-4 h-4 text-primary" />
-                Save orders and reorder in one tap
+                {t("home_guest_subtitle")}
               </p>
             </div>
           ) : (
@@ -216,11 +217,11 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
                 {user?.email_verified ? (
                   <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 text-xs font-semibold">
                     <CheckCircle className="w-3 h-3" />
-                    <span>Verified</span>
+                    <span>{t("profile_email_verified")}</span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-yellow-500/15 text-yellow-400 text-xs font-semibold">
-                    <span>Unverified</span>
+                    <span>{t("profile_email_unverified")}</span>
                   </div>
                 )}
               </div>
@@ -230,7 +231,7 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
                 size="sm"
                 className="text-muted-foreground hover:text-foreground"
               >
-                <a href={getLogoutUrl("/")}>Log out</a>
+                <a href={getLogoutUrl("/")}>{t("nav_logout")}</a>
               </Button>
             </div>
           )}
@@ -249,10 +250,10 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
                 </div>
                 <div className="flex-1">
                   <h2 className="text-base font-bold text-foreground">
-                    Welcome back
+                    {t("home_welcome_back")}
                   </h2>
                   <p className="text-xs text-muted-foreground">
-                    Reorder your last order in one tap
+                    {t("home_first_order_subtitle")}
                   </p>
                 </div>
               </div>
@@ -262,7 +263,7 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
             <div className="px-5 py-4">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Your last order
+                  {t("home_reorder_title")}
                 </p>
                 {lastOrder?.created_at && (
                   <p className="text-xs text-muted-foreground">
@@ -287,7 +288,7 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
               {/* Total line */}
               <div className="flex items-center justify-between py-3 border-t border-border/20">
                 <span className="text-sm font-semibold text-foreground">
-                  Total
+                  {t("profile_order_total")}
                 </span>
                 <span className="text-lg font-bold text-primary neon-text-readable">
                   ${lastOrderTotal.toFixed(2)}
@@ -301,7 +302,7 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
                   className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle flex-1 h-12 font-semibold text-base active-scale"
                 >
                   <Repeat className="w-4 h-4 mr-2" />
-                  Reorder last order
+                  {t("home_reorder_cta")}
                 </Button>
                 <Button
                   asChild
@@ -309,7 +310,7 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
                   className="border-border/40 text-foreground hover:bg-secondary/50 sm:flex-none h-12 px-5 font-medium text-sm bg-transparent active-scale"
                 >
                   <Link href="/profile">
-                    View order history
+                    {t("profile_orders_title")}
                   </Link>
                 </Button>
               </div>
@@ -323,18 +324,17 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
               </div>
               <div className="flex-1">
                 <h2 className="text-base font-bold text-foreground mb-1">
-                  Ready for your first order?
+                  {t("home_first_order_title")}
                 </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                  Build your perfect pizza in under 30 seconds. We{"'"}ll
-                  remember your favorites.
+                  {t("home_first_order_subtitle")}
                 </p>
                 <Button
                   asChild
                   className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle h-11 px-5 font-semibold active-scale"
                 >
                   <Link href="/order">
-                    Browse menu
+                    {t("home_first_order_cta")}
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Link>
                 </Button>
@@ -349,17 +349,17 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
               </div>
               <div className="flex-1">
                 <h2 className="text-base font-bold text-foreground mb-1">
-                  Start your pizza journey
+                  {t("home_guest_title")}
                 </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                  Explore our curated menu and discover something delicious.
+                  {t("home_guest_subtitle")}
                 </p>
                 <Button
                   asChild
                   className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle h-11 px-5 font-semibold active-scale"
                 >
                   <Link href="/order">
-                    Browse menu
+                    {t("home_guest_cta")}
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Link>
                 </Button>
