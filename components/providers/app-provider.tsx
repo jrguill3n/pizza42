@@ -76,13 +76,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const login = useCallback(() => {
-    setUserTypeState("verified");
-    setSession(getSessionMock("verified"));
+    window.location.href = "/auth/login";
   }, []);
 
   const logout = useCallback(() => {
-    setUserTypeState("logged-out");
-    setSession(getSessionMock("logged-out"));
+    window.location.href = "/auth/logout";
   }, []);
 
   const setUserType = useCallback((type: "logged-out" | "verified" | "unverified" | "newVerified") => {
