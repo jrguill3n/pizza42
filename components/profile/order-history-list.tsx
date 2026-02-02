@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Package, Loader2, AlertCircle } from "lucide-react";
 
 /**
@@ -39,55 +39,67 @@ export function OrderHistoryList({ userId }: OrderHistoryListProps) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const loadOrders = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Step 1: Get access token
+      const tokenRes = await fetch("/api/auth/token", {
+        credentials: "include",
+        cache: "no-store",
+      });
+
+      if (!tokenRes.ok) {
+        throw new Error("Failed to get access token");
+      }
+
+      const tokenData = await tokenRes.json();
+      const accessToken = tokenData.accessToken;
+
+      if (!accessToken) {
+        throw new Error("No access token returned");
+      }
+
+      // Step 2: Fetch orders with token
+      const ordersRes = await fetch("/api/orders", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        cache: "no-store",
+      });
+
+      if (!ordersRes.ok) {
+        const errorData = await ordersRes.json();
+        throw new Error(errorData.error || "Failed to fetch orders");
+      }
+
+      const ordersData = await ordersRes.json();
+      setOrders(ordersData.orders || []);
+    } catch (err: any) {
+      console.error("[v0] Failed to load orders:", err);
+      setError(err.message || "Failed to load orders");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const loadOrders = async () => {
-      setIsLoading(true);
-      setError(null);
-      
-      try {
-        // Step 1: Get access token
-        const tokenRes = await fetch("/api/auth/token", {
-          credentials: "include",
-          cache: "no-store",
-        });
-
-        if (!tokenRes.ok) {
-          throw new Error("Failed to get access token");
-        }
-
-        const tokenData = await tokenRes.json();
-        const accessToken = tokenData.accessToken;
-
-        if (!accessToken) {
-          throw new Error("No access token returned");
-        }
-
-        // Step 2: Fetch orders with token
-        const ordersRes = await fetch("/api/orders", {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          cache: "no-store",
-        });
-
-        if (!ordersRes.ok) {
-          const errorData = await ordersRes.json();
-          throw new Error(errorData.error || "Failed to fetch orders");
-        }
-
-        const ordersData = await ordersRes.json();
-        setOrders(ordersData.orders || []);
-      } catch (err: any) {
-        console.error("[v0] Failed to load orders:", err);
-        setError(err.message || "Failed to load orders");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
     loadOrders();
-  }, [userId]);
+  }, [userId, refreshTrigger, loadOrders]);
+
+  // Listen for order-placed events
+  useEffect(() => {
+    const handleOrderPlaced = () => {
+      console.log("[v0] Order placed event received, refreshing order history");
+      setRefreshTrigger((prev) => prev + 1);
+    };
+
+    window.addEventListener("order-placed", handleOrderPlaced);
+    return () => window.removeEventListener("order-placed", handleOrderPlaced);
+  }, []);
 
   // Loading state
   if (isLoading) {
