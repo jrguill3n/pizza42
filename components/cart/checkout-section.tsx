@@ -121,7 +121,7 @@ export function CheckoutSection({ onClose }: CheckoutSectionProps) {
                 variant="outline"
                 className="w-full h-11 bg-transparent border-border/50 hover:bg-secondary/30 font-medium"
               >
-                Continue browsing
+                {t("cart_continue_browsing")}
               </Button>
             </DialogFooter>
           </DialogContent>

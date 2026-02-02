@@ -47,6 +47,7 @@ export const copy = {
     cart_verify_required_cta: "I've Verified My Email",
     cart_order_placed: "Order placed successfully!",
     cart_order_error: "Failed to place order. Please try again.",
+    cart_continue_browsing: "Continue browsing",
     
     // Profile
     profile_title: "Profile",
@@ -102,6 +103,7 @@ export const copy = {
     cart_verify_required_cta: "Ya Verifiqué Mi Email",
     cart_order_placed: "¡Pedido realizado con éxito!",
     cart_order_error: "Error al realizar el pedido. Por favor intenta de nuevo.",
+    cart_continue_browsing: "Seguir navegando",
     
     // Perfil
     profile_title: "Perfil",
