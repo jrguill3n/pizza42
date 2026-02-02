@@ -24,13 +24,21 @@ export function CheckoutSection({ onClose }: CheckoutSectionProps) {
   const { session, login } = useAuth();
   const [isPlacing, setIsPlacing] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const isVerified = session.user?.email_verified; // Declare isVerified variable
+  const emailVerified = session.user?.email_verified; // Declare emailVerified variable
 
   const isAuthenticated = session.isAuthenticated;
-  const isVerified = session.user?.email_verified ?? false;
   const canCheckout = isAuthenticated && items.length > 0;
 
   const handlePlaceOrder = async () => {
     if (!isAuthenticated || items.length === 0) return;
+
+    // Only block if email_verified is explicitly false
+    if (emailVerified === false) {
+      setShowVerifyModal(true);
+      return;
+    }
 
     setIsPlacing(true);
     try {
@@ -39,9 +47,7 @@ export function CheckoutSection({ onClose }: CheckoutSectionProps) {
       if (!result.success) {
         // Handle email_not_verified error from server
         if (result.code === "email_not_verified") {
-          toast.error("Email verification required", {
-            description: "Please verify your email before placing orders",
-          });
+          setShowVerifyModal(true);
           return;
         }
         
@@ -68,37 +74,6 @@ export function CheckoutSection({ onClose }: CheckoutSectionProps) {
       setIsPlacing(false);
     }
   };
-
-  // Show verification banner if authenticated but not verified
-  if (isAuthenticated && !isVerified) {
-    return (
-      <div className="space-y-4">
-        <div className="p-4 rounded-xl bg-accent/10 border border-accent/20">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-accent/15 flex items-center justify-center shrink-0">
-              <Mail className="w-5 h-5 text-accent" />
-            </div>
-            <div>
-              <h4 className="font-semibold text-foreground text-sm mb-0.5">
-                Verify your email
-              </h4>
-              <p className="text-muted-foreground text-xs leading-relaxed">
-                Check your inbox to verify your email and unlock checkout.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <Button
-          disabled
-          className="w-full h-12 bg-muted text-muted-foreground cursor-not-allowed font-semibold"
-        >
-          <AlertCircle className="w-4 h-4 mr-2" />
-          Verification required
-        </Button>
-      </div>
-    );
-  }
 
   // Show login prompt if not authenticated
   if (!isAuthenticated) {
@@ -155,19 +130,46 @@ export function CheckoutSection({ onClose }: CheckoutSectionProps) {
   }
 
   return (
-    <Button
-      onClick={handlePlaceOrder}
-      disabled={!canCheckout || isPlacing}
-      className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle font-semibold text-base transition-neon active-scale disabled:opacity-50 disabled:cursor-not-allowed disabled:neon-glow-none"
-    >
-      {isPlacing ? (
-        <>
-          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-          Placing order...
-        </>
-      ) : (
-        "Place order"
-      )}
-    </Button>
+    <>
+      <Button
+        onClick={handlePlaceOrder}
+        disabled={!canCheckout || isPlacing}
+        className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle font-semibold text-base transition-neon active-scale disabled:opacity-50 disabled:cursor-not-allowed disabled:neon-glow-none"
+      >
+        {isPlacing ? (
+          <>
+            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+            Placing order...
+          </>
+        ) : (
+          "Place order"
+        )}
+      </Button>
+
+      {/* Email Verification Modal */}
+      <Dialog open={showVerifyModal} onOpenChange={setShowVerifyModal}>
+        <DialogContent className="glass border border-border/50">
+          <DialogHeader>
+            <div className="w-12 h-12 rounded-xl bg-accent/15 flex items-center justify-center mx-auto mb-3">
+              <Mail className="w-6 h-6 text-accent" />
+            </div>
+            <DialogTitle className="text-center text-xl">
+              Verify your email
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              Please check your inbox and verify your email address before placing orders.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-col gap-2 sm:flex-col">
+            <Button
+              onClick={() => setShowVerifyModal(false)}
+              className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-subtle font-semibold"
+            >
+              Got it
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
