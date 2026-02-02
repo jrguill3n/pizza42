@@ -115,18 +115,25 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
         lastOrder.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
     : 0;
 
-  // Format date helper
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
+  // Format friendly date helper
+  function formatFriendlyDate(iso: string) {
+    const d = new Date(iso);
     const now = new Date();
-    const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) return "today";
-    if (diffDays === 1) return "yesterday";
-    if (diffDays < 7) return `${diffDays} days ago`;
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-  };
+
+    const isSameDay = d.toDateString() === now.toDateString();
+
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+
+    if (isSameDay) return "Today";
+    if (d.toDateString() === yesterday.toDateString()) return "Yesterday";
+
+    return d.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: now.getFullYear() !== d.getFullYear() ? "numeric" : undefined,
+    });
+  }
 
   const handleRepeatOrder = () => {
     if (!lastOrder?.items) return;
@@ -257,9 +264,9 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Your last order
                 </p>
-                {(lastOrder?.created_at || ordersContext?.last_order_at) && (
+                {lastOrder?.created_at && (
                   <p className="text-xs text-muted-foreground">
-                    {formatDate(lastOrder?.created_at || ordersContext?.last_order_at || "")}
+                    {formatFriendlyDate(lastOrder.created_at)}
                   </p>
                 )}
               </div>
