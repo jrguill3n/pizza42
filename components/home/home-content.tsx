@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
-import { Sparkles, ShoppingBag, Repeat, CheckCircle, Zap, Clock } from "lucide-react";
+import { Sparkles, ShoppingBag, Repeat, CheckCircle, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MenuItemCard } from "@/components/menu/menu-item-card";
 import { useCart } from "@/components/providers/app-provider";
