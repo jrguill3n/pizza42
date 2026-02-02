@@ -4,8 +4,10 @@ import React from "react";
 
 import { useEffect, useState } from "react";
 import { Users, Sparkles, Repeat, Crown, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { getOrders } from "@/lib/api-client";
 import type { OrdersContext } from "@/lib/auth0";
+import { t } from "@/lib/copy";
 
 interface SegmentationPreviewCardProps {
   ordersContext: OrdersContext | null;
@@ -15,7 +17,8 @@ type Segment = "new_customer" | "repeat_customer" | "power_customer";
 
 interface SegmentInfo {
   label: string;
-  reasoning: string;
+  benefit: string;
+  cta: string;
   icon: React.ReactNode;
   color: string;
 }
@@ -35,22 +38,25 @@ function getSegmentInfo(segment: Segment): SegmentInfo {
   switch (segment) {
     case "new_customer":
       return {
-        label: "New Customer",
-        reasoning: "First order bonus unlocked.",
+        label: t("segment_new_customer"),
+        benefit: t("segment_new_benefit"),
+        cta: t("segment_new_cta"),
         icon: <Sparkles className="w-4 h-4" />,
         color: "bg-green-500/20 text-green-400 border-green-500/30",
       };
     case "repeat_customer":
       return {
-        label: "Repeat Customer",
-        reasoning: "Welcome back! Reorder in one tap.",
+        label: t("segment_returning"),
+        benefit: t("segment_returning_benefit"),
+        cta: t("segment_returning_cta"),
         icon: <Repeat className="w-4 h-4" />,
         color: "bg-primary/20 text-primary border-primary/30",
       };
     case "power_customer":
       return {
-        label: "Power Customer (VIP)",
-        reasoning: "You're one of our regulars. Thanks for coming back!",
+        label: t("segment_power"),
+        benefit: t("segment_power_benefit"),
+        cta: t("segment_power_cta"),
         icon: <Crown className="w-4 h-4" />,
         color: "bg-accent/20 text-accent border-accent/30",
       };
@@ -119,7 +125,7 @@ export function SegmentationPreviewCard({ ordersContext }: SegmentationPreviewCa
   }
 
   return (
-    <div className="glass rounded-2xl p-6 space-y-4">
+    <div className="glass rounded-2xl p-6 space-y-5">
       <div className="flex items-center gap-2">
         <Users className="w-5 h-5 text-primary" />
         <h3 className="text-lg font-semibold text-foreground">Segmentation preview</h3>
@@ -134,9 +140,9 @@ export function SegmentationPreviewCard({ ordersContext }: SegmentationPreviewCa
             <Info className="w-3 h-3 text-muted-foreground" />
           </button>
           {showTooltip && (
-            <div className="absolute right-0 top-full mt-2 w-48 glass-elevated rounded-lg p-3 text-xs text-foreground shadow-lg z-10">
-              <p className="font-semibold mb-1">Why am I seeing this?</p>
-              <p className="text-muted-foreground">Based on your order history.</p>
+            <div className="absolute right-0 top-full mt-2 w-56 glass-elevated rounded-lg p-3 text-xs text-foreground shadow-lg z-10">
+              <p className="font-semibold mb-1">{t("segment_tooltip_title")}</p>
+              <p className="text-muted-foreground">{t("segment_tooltip_text")}</p>
             </div>
           )}
         </div>
@@ -147,7 +153,8 @@ export function SegmentationPreviewCard({ ordersContext }: SegmentationPreviewCa
           isAnimating ? "opacity-0 scale-95" : "opacity-100 scale-100"
         }`}
       >
-        <div className="flex items-center gap-3">
+        {/* Segment Badge */}
+        <div className="flex items-center gap-3 mb-4">
           <span
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border ${segmentInfo.color}`}
           >
@@ -155,13 +162,22 @@ export function SegmentationPreviewCard({ ordersContext }: SegmentationPreviewCa
             {segmentInfo.label}
           </span>
           <span className="text-sm text-muted-foreground tabular-nums">
-            {ordersCount} {ordersCount === 1 ? "order" : "orders"}
+            {ordersCount} {ordersCount === 1 ? "pedido" : "pedidos"}
           </span>
         </div>
 
-        <p className="text-muted-foreground text-sm leading-relaxed mt-4">
-          {segmentInfo.reasoning}
-        </p>
+        {/* Benefit & CTA */}
+        <div className="bg-secondary/20 rounded-xl p-4 border border-border/10">
+          <p className="text-foreground font-medium text-sm leading-relaxed mb-3">
+            {segmentInfo.benefit}
+          </p>
+          <Button
+            size="sm"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
+          >
+            {segmentInfo.cta}
+          </Button>
+        </div>
       </div>
     </div>
   );
