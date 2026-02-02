@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth0 } from "@/lib/auth0";
+import { getAccessTokenForRequest } from "@/lib/getAccessTokenForRequest";
 
 export const runtime = "nodejs";
 
@@ -8,7 +9,7 @@ export const runtime = "nodejs";
  * Debug endpoint to check Auth0 session and access token retrieval
  * Returns session status, token status, and scope information
  */
-export async function GET() {
+export async function GET(request: Request) {
   // Check session
   const session = await auth0.getSession();
   const hasSession = !!session;
@@ -23,25 +24,23 @@ export async function GET() {
 
   // Try to get access token
   try {
-    const tokenResult = await auth0.getAccessToken();
+    const tokenResult = await getAccessTokenForRequest(request);
 
-    if (!tokenResult || !tokenResult.accessToken) {
-      return NextResponse.json(
-        {
-          hasSession: true,
-          hasAccessToken: false,
-          errorName: "NoTokenReturned",
-          errorMessage: "getAccessToken() returned no token",
-        },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
+    const jsonResponse = NextResponse.json({
       hasSession: true,
       hasAccessToken: true,
       scope: tokenResult.scope || "",
     });
+    
+    // Preserve any set-cookie headers from the token response
+    if (tokenResult.response) {
+      const cookies = tokenResult.response.headers.get("set-cookie");
+      if (cookies) {
+        jsonResponse.headers.set("set-cookie", cookies);
+      }
+    }
+    
+    return jsonResponse;
   } catch (error: any) {
     return NextResponse.json(
       {

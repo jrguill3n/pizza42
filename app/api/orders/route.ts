@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth0 } from "@/lib/auth0";
+import { getAccessTokenForRequest } from "@/lib/getAccessTokenForRequest";
 
 export const runtime = "nodejs";
 
@@ -24,7 +25,7 @@ interface Order {
  * Returns user's orders
  * Requires scope: read:orders
  */
-export async function GET() {
+export async function GET(request: Request) {
   // Check session first
   const session = await auth0.getSession();
   
@@ -38,16 +39,13 @@ export async function GET() {
   // Get access token with required scopes
   let accessToken: string;
   let scope: string;
+  let tokenResponse: NextResponse | undefined;
   try {
-    const tokenResult = await auth0.getAccessToken();
-    
-    if (!tokenResult || !tokenResult.accessToken) {
-      console.log("[v0] GET /api/orders: Token retrieval returned no token");
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    }
+    const tokenResult = await getAccessTokenForRequest(request);
     
     accessToken = tokenResult.accessToken;
     scope = tokenResult.scope || "";
+    tokenResponse = tokenResult.response;
     console.log("[v0] GET /api/orders: Access token received:", !!accessToken);
     console.log("[v0] GET /api/orders: Raw scope string:", scope);
   } catch (error: any) {
@@ -66,7 +64,17 @@ export async function GET() {
   // Get orders for user
   const orders = ordersStore.get(userId) || [];
   
-  return NextResponse.json({ orders, orders_count: orders.length });
+  const jsonResponse = NextResponse.json({ orders, orders_count: orders.length });
+  
+  // Preserve any set-cookie headers from the token response
+  if (tokenResponse) {
+    const cookies = tokenResponse.headers.get("set-cookie");
+    if (cookies) {
+      jsonResponse.headers.set("set-cookie", cookies);
+    }
+  }
+  
+  return jsonResponse;
 }
 
 /**
@@ -88,16 +96,13 @@ export async function POST(request: Request) {
   // Get access token with required scopes
   let accessToken: string;
   let scope: string;
+  let tokenResponse: NextResponse | undefined;
   try {
-    const tokenResult = await auth0.getAccessToken();
-    
-    if (!tokenResult || !tokenResult.accessToken) {
-      console.log("[v0] POST /api/orders: Token retrieval returned no token");
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    }
+    const tokenResult = await getAccessTokenForRequest(request);
     
     accessToken = tokenResult.accessToken;
     scope = tokenResult.scope || "";
+    tokenResponse = tokenResult.response;
     console.log("[v0] POST /api/orders: Access token received:", !!accessToken);
     console.log("[v0] POST /api/orders: Raw scope string:", scope);
   } catch (error: any) {
@@ -154,5 +159,15 @@ export async function POST(request: Request) {
   userOrders.push(order);
   ordersStore.set(userId, userOrders);
 
-  return NextResponse.json({ order, orders_count: userOrders.length }, { status: 201 });
+  const jsonResponse = NextResponse.json({ order, orders_count: userOrders.length }, { status: 201 });
+  
+  // Preserve any set-cookie headers from the token response
+  if (tokenResponse) {
+    const cookies = tokenResponse.headers.get("set-cookie");
+    if (cookies) {
+      jsonResponse.headers.set("set-cookie", cookies);
+    }
+  }
+  
+  return jsonResponse;
 }
