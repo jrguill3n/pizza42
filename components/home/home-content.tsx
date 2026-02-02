@@ -85,10 +85,13 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
                   id: item.sku,
                   name: item.name,
                   price: item.price_cents / 100,
+                  price_cents: item.price_cents,
                   quantity: item.qty,
                   category: "pizza" as const,
                 })),
                 total: order.total_cents / 100,
+                total_cents: order.total_cents,
+                created_at: order.created_at,
               })),
             });
           }
@@ -139,12 +142,16 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
   const handleRepeatOrder = () => {
     if (!lastOrder?.items) return;
     
-    // Convert last order items to cart items (matching OrderItem interface)
+    // Convert last order items to cart items with price_cents preserved
     lastOrder.items.forEach((item) => {
+      // Use price_cents if available, otherwise convert price to cents
+      const price_cents = item.price_cents ?? Math.round(item.price * 100);
+      
       addItem({
         id: item.id,
         name: item.name,
         price: item.price,
+        price_cents: price_cents,
         quantity: item.quantity,
         category: item.category,
       });

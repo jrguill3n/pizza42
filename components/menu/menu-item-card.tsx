@@ -32,6 +32,7 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
       id: item.id,
       name: item.name,
       price: item.price,
+      price_cents: Math.round(item.price * 100), // Store cents for accurate calculations
       quantity: 1,
       category: item.category,
     });

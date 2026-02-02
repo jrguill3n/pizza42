@@ -21,6 +21,7 @@ export interface OrdersContext {
       id: string;
       name: string;
       price: number;
+      price_cents?: number;
       quantity: number;
       category: "pizza" | "sides" | "drinks";
     }>;
