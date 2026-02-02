@@ -6,6 +6,7 @@ export const auth0 = new Auth0Client({
     audience: process.env.AUTH0_AUDIENCE,
     scope: "openid profile email read:orders create:orders",
   },
+  beforeSessionSaved: async (session) => ({ ...session }),
 });
 
 // Custom claim namespace for orders context
