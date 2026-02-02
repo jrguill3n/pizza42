@@ -1,45 +1,9 @@
 import { NextResponse } from "next/server";
-import * as jose from "jose";
 import { getUser } from "@/lib/auth0Management.server";
+import { verifyAccessToken, requireScope, getUserId } from "@/lib/auth.server";
+import { verifyToken, checkPermission } from "@/lib/auth.server"; // Declare the missing variables
 
 export const runtime = "nodejs";
-
-// Cache JWKS for performance
-let jwksCache: jose.JWTVerifyGetKey | null = null;
-
-async function getJWKS(): Promise<jose.JWTVerifyGetKey> {
-  if (!jwksCache) {
-    const issuer = process.env.AUTH0_ISSUER_BASE_URL!;
-    const issuerUrl = issuer.endsWith("/") ? issuer : `${issuer}/`;
-    const jwksUrl = new URL(".well-known/jwks.json", issuerUrl);
-    jwksCache = jose.createRemoteJWKSet(jwksUrl);
-  }
-  return jwksCache;
-}
-
-async function verifyToken(token: string) {
-  const issuer = process.env.AUTH0_ISSUER_BASE_URL!;
-  const issuerUrl = issuer.endsWith("/") ? issuer : `${issuer}/`;
-  const audience = process.env.AUTH0_AUDIENCE!;
-  const JWKS = await getJWKS();
-
-  const { payload } = await jose.jwtVerify(token, JWKS, {
-    issuer: issuerUrl,
-    audience: audience,
-  });
-
-  return payload;
-}
-
-function checkPermission(payload: any, required: string): boolean {
-  if (payload.permissions?.includes(required)) {
-    return true;
-  }
-  if (payload.scope?.split(" ").includes(required)) {
-    return true;
-  }
-  return false;
-}
 
 /**
  * GET /api/orders/history
@@ -47,33 +11,21 @@ function checkPermission(payload: any, required: string): boolean {
  * Requires permission: read:orders
  */
 export async function GET(request: Request) {
-  // Extract Authorization header
+  // Verify token
   const authHeader = request.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const result = await verifyAccessToken(authHeader);
+  
+  if (result.error) {
+    return NextResponse.json({ error: result.error }, { status: result.status });
   }
 
-  const token = authHeader.substring(7);
-
-  // Verify JWT
-  let payload: any;
-  try {
-    payload = await verifyToken(token);
-  } catch (error) {
-    console.error("[v0] GET /api/orders/history: JWT verification failed:", error);
-    return NextResponse.json({ error: "invalid_token" }, { status: 401 });
+  // Check permission
+  const scopeError = requireScope(result.payload, "read:orders");
+  if (scopeError) {
+    return NextResponse.json({ error: scopeError.error }, { status: scopeError.status });
   }
 
-  // Check permissions
-  if (!checkPermission(payload, "read:orders")) {
-    return NextResponse.json(
-      { error: "forbidden", missing: "read:orders" },
-      { status: 403 }
-    );
-  }
-
-  // Get user ID from token
-  const userId = payload.sub as string;
+  const userId = getUserId(result.payload);
 
   // Get user's order history from user_metadata
   try {
