@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth0 } from "@/lib/auth0";
 import { getAccessTokenForRequest } from "@/lib/getAccessTokenForRequest";
+import * as jose from "jose";
 
 export const runtime = "nodejs";
 
@@ -38,26 +39,32 @@ export async function GET(request: Request) {
 
   // Get access token with required scopes
   let accessToken: string;
-  let scope: string;
   let tokenResponse: NextResponse | undefined;
   try {
     const tokenResult = await getAccessTokenForRequest(request);
-    
     accessToken = tokenResult.accessToken;
-    scope = tokenResult.scope || "";
     tokenResponse = tokenResult.response;
     console.log("[v0] GET /api/orders: Access token received:", !!accessToken);
-    console.log("[v0] GET /api/orders: Raw scope string:", scope);
   } catch (error: any) {
     console.error("[v0] GET /api/orders: Token retrieval failed:", error.message || error);
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  // Verify scope
-  const scopes = scope.split(" ");
+  // Decode token to check permissions/scopes
+  let payload: any;
+  try {
+    payload = jose.decodeJwt(accessToken);
+  } catch (error) {
+    console.error("[v0] GET /api/orders: Token decode failed:", error);
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  // Check permissions array (RBAC) or scope string
+  const hasPermission = payload.permissions?.includes("read:orders");
+  const hasScope = payload.scope?.split(" ").includes("read:orders");
   
-  if (!scopes.includes("read:orders")) {
-    console.log("[v0] GET /api/orders: Missing required scope read:orders");
+  if (!hasPermission && !hasScope) {
+    console.log("[v0] GET /api/orders: Missing required scope/permission read:orders");
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
@@ -95,26 +102,32 @@ export async function POST(request: Request) {
 
   // Get access token with required scopes
   let accessToken: string;
-  let scope: string;
   let tokenResponse: NextResponse | undefined;
   try {
     const tokenResult = await getAccessTokenForRequest(request);
-    
     accessToken = tokenResult.accessToken;
-    scope = tokenResult.scope || "";
     tokenResponse = tokenResult.response;
     console.log("[v0] POST /api/orders: Access token received:", !!accessToken);
-    console.log("[v0] POST /api/orders: Raw scope string:", scope);
   } catch (error: any) {
     console.error("[v0] POST /api/orders: Token retrieval failed:", error.message || error);
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  // Verify scope
-  const scopes = scope.split(" ");
+  // Decode token to check permissions/scopes
+  let payload: any;
+  try {
+    payload = jose.decodeJwt(accessToken);
+  } catch (error) {
+    console.error("[v0] POST /api/orders: Token decode failed:", error);
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  // Check permissions array (RBAC) or scope string
+  const hasPermission = payload.permissions?.includes("create:orders");
+  const hasScope = payload.scope?.split(" ").includes("create:orders");
   
-  if (!scopes.includes("create:orders")) {
-    console.log("[v0] POST /api/orders: Missing required scope create:orders");
+  if (!hasPermission && !hasScope) {
+    console.log("[v0] POST /api/orders: Missing required scope/permission create:orders");
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
