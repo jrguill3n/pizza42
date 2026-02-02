@@ -5,9 +5,6 @@ import { getUser, updateUserMetadata } from "@/lib/auth0Management";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// In-memory storage for orders (temporary)
-const ordersStore = new Map<string, Array<Order>>();
-
 interface OrderItem {
   sku: string;
   name: string;
