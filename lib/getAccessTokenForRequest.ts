@@ -2,41 +2,31 @@ import { NextResponse } from "next/server";
 import { auth0 } from "@/lib/auth0";
 
 /**
- * Helper to get access token for a request with proper SDK signature handling
- * Tries auth0.getAccessToken(request) first, then falls back to auth0.getAccessToken(request, response)
- * Returns { accessToken, scope } and ensures any set-cookie headers are preserved
+ * Helper to get access token for the current session in an App Router route handler.
+ * Uses @auth0/nextjs-auth0 v4 with proper audience and scopes.
+ * Returns { accessToken, response } where response contains any set-cookie headers.
  */
 export async function getAccessTokenForRequest(request: Request): Promise<{
   accessToken: string;
-  scope: string;
-  response?: NextResponse;
+  response?: Response;
 }> {
-  try {
-    // Try calling with just request first
-    const tokenResult = await auth0.getAccessToken(request);
-    
-    if (tokenResult && tokenResult.accessToken) {
-      return {
-        accessToken: tokenResult.accessToken,
-        scope: tokenResult.scope || "",
-      };
-    }
-  } catch (error: any) {
-    // If it fails due to argument mismatch, try with response object
-    console.log("[v0] getAccessToken(request) failed, trying with response:", error.message);
-  }
+  // Create a NextResponse to allow SDK to set cookies if needed
+  const res = new NextResponse();
 
-  // Fallback: try with response object
-  const response = NextResponse.next();
-  const tokenResult = await auth0.getAccessToken(request, response);
-  
-  if (!tokenResult || !tokenResult.accessToken) {
-    throw new Error("NoTokenReturned");
+  // Get access token with required audience and scopes
+  const { token } = await auth0.getAccessToken(request, res, {
+    authorizationParams: {
+      audience: process.env.AUTH0_AUDIENCE,
+      scope: "openid profile email read:orders create:orders",
+    },
+  });
+
+  if (!token) {
+    throw new Error("No access token returned from Auth0");
   }
 
   return {
-    accessToken: tokenResult.accessToken,
-    scope: tokenResult.scope || "",
-    response,
+    accessToken: token,
+    response: res,
   };
 }
