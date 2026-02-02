@@ -1,3 +1,5 @@
+import "server-only";
+
 /**
  * Auth0 Management API helpers
  */

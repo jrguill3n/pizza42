@@ -1,4 +1,4 @@
-import { auth0 } from "@/lib/auth0";
+import { auth0 } from "@/lib/auth0.server";
 
 export default async function DebugSessionPage() {
   const session = await auth0.getSession();

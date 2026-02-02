@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import * as jose from "jose";
-import { getUser, updateUserMetadata } from "@/lib/auth0Management";
+import { getUser, updateUserMetadata } from "@/lib/auth0Management.server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

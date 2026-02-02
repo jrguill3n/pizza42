@@ -1,7 +1,7 @@
 import { Header } from "@/components/layout/header";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { ProfileContent } from "@/components/profile/profile-content";
-import { getSessionUserServer, getOrdersContext } from "@/lib/auth0";
+import { getSessionUserServer, getOrdersContext } from "@/lib/auth0.server";
 
 export const dynamic = "force-dynamic";
 
