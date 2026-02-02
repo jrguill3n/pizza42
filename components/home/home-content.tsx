@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   ChevronRight,
@@ -57,18 +58,16 @@ export function HomeContent({ user, ordersContext }: HomeContentProps) {
 
         <div className="relative z-10">
           {/* Brand */}
-          <div className="flex items-center gap-3 mb-5">
-            <div className="w-14 h-14 rounded-2xl bg-primary/15 flex items-center justify-center border border-primary/20">
-              <span className="text-2xl font-black text-primary neon-text-readable">
-                42
-              </span>
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
-                Pizza <span className="text-primary neon-text-readable">42</span>
-              </h1>
-              <p className="text-sm text-muted-foreground">Neon fast delivery</p>
-            </div>
+          <div className="mb-5">
+            <Image
+              src="/brand/pizza42-logo.png"
+              alt="Pizza 42"
+              width={240}
+              height={72}
+              className="h-16 w-auto mb-2"
+              priority
+            />
+            <p className="text-sm text-muted-foreground">Neon fast delivery</p>
           </div>
 
           <p className="text-lg md:text-xl text-foreground/90 font-medium mb-6 max-w-sm leading-relaxed">
