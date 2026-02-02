@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import * as jose from "jose";
+import { getUser, updateUserMetadata } from "@/lib/auth0Management";
 
 export const runtime = "nodejs";
 
@@ -95,10 +96,18 @@ export async function GET(request: Request) {
   // Get user ID from token
   const userId = payload.sub as string;
 
-  // Get orders for user
-  const orders = ordersStore.get(userId) || [];
-
-  return NextResponse.json({ ok: true, orders });
+  // Fetch orders from user_metadata via Management API
+  try {
+    const user = await getUser(userId);
+    const orders = (user.user_metadata?.orders as Order[]) || [];
+    return NextResponse.json({ ok: true, orders, orders_count: orders.length });
+  } catch (error: any) {
+    console.error("[v0] GET /api/orders: Management API error:", error);
+    return NextResponse.json(
+      { error: "mgmt_api_error", detail: error.message },
+      { status: 500 }
+    );
+  }
 }
 
 /**
@@ -190,10 +199,30 @@ export async function POST(request: Request) {
     note: body.note,
   };
 
-  // Store order in memory
-  const userOrders = ordersStore.get(userId) || [];
-  userOrders.push(order);
-  ordersStore.set(userId, userOrders);
+  // Persist to user_metadata via Management API
+  try {
+    // Read current user metadata
+    const user = await getUser(userId);
+    const currentOrders = (user.user_metadata?.orders as Order[]) || [];
 
-  return NextResponse.json({ ok: true, order }, { status: 201 });
+    // Append new order and keep only last 5
+    const nextOrders = [order, ...currentOrders].slice(0, 5);
+
+    // Update user_metadata
+    await updateUserMetadata(userId, {
+      ...user.user_metadata,
+      orders: nextOrders,
+    });
+
+    return NextResponse.json(
+      { ok: true, order, orders_count: nextOrders.length },
+      { status: 201 }
+    );
+  } catch (error: any) {
+    console.error("[v0] POST /api/orders: Management API error:", error);
+    return NextResponse.json(
+      { error: "mgmt_api_error", detail: error.message },
+      { status: 500 }
+    );
+  }
 }
