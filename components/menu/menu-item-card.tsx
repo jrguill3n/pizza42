@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { Plus, Minus, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -32,6 +31,7 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
       id: item.id,
       name: item.name,
       price: item.price,
+      price_cents: Math.round(item.price * 100), // Store cents for accurate calculations
       quantity: 1,
       category: item.category,
     });
@@ -61,12 +61,12 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
         <div className="w-full aspect-square rounded-xl bg-secondary/30 mb-3 flex items-center justify-center overflow-hidden relative">
           {!imageError ? (
             <>
-              <Image
+              <img
                 src={getMenuItemImage(item.name) || "/placeholder.svg"}
                 alt={item.name}
-                fill
-                className="object-cover"
                 loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover rounded-xl"
                 onError={() => setImageError(true)}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
@@ -94,9 +94,10 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
             <Button
               onClick={handleAdd}
               size="sm"
-              className="w-full h-10 bg-primary/15 text-primary hover:bg-primary hover:text-primary-foreground transition-neon active-scale font-semibold"
+              variant="ghost"
+              className="w-full h-8 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-neon active-scale font-medium text-sm"
             >
-              <Plus className="w-4 h-4 mr-1.5" />
+              <Plus className="w-4 h-4 mr-1" />
               {t("menu_add_to_cart")}
             </Button>
           ) : (
@@ -129,18 +130,16 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
   if (variant === "compact") {
     return (
       <div className="flex items-center gap-3 p-3 glass-elevated rounded-xl transition-neon hover:bg-secondary/30">
-        <div className="w-12 h-12 rounded-lg bg-secondary/40 flex items-center justify-center shrink-0 overflow-hidden relative">
+        <div className="w-12 h-12 rounded-lg bg-secondary/40 flex items-center justify-center shrink-0 overflow-hidden">
           {!imageError ? (
-            <>
-              <Image
-                src={getMenuItemImage(item.name) || "/placeholder.svg"}
-                alt={item.name}
-                fill
-                className="object-cover"
-                loading="lazy"
-                onError={() => setImageError(true)}
-              />
-            </>
+            <img
+              src={getMenuItemImage(item.name) || "/placeholder.svg"}
+              alt={item.name}
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover rounded-lg"
+              onError={() => setImageError(true)}
+            />
           ) : (
             <span className="text-base font-bold text-primary/70">{categoryLetter}</span>
           )}
@@ -149,15 +148,15 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
           <h3 className="font-semibold text-foreground text-sm truncate">{item.name}</h3>
           <p className="text-primary font-bold text-sm">${item.price.toFixed(2)}</p>
         </div>
-        {quantity === 0 ? (
-          <Button
-            onClick={handleAdd}
-            size="icon"
-            className="h-10 w-10 bg-primary/15 text-primary hover:bg-primary hover:text-primary-foreground active-scale"
-            aria-label={`Add ${item.name} to cart`}
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
+          {quantity === 0 ? (
+            <Button
+              onClick={handleAdd}
+              size="sm"
+              variant="ghost"
+              className="ml-auto text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-neon h-8 px-3 font-medium active-scale"
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
         ) : (
           <div className="flex items-center gap-1 bg-secondary/30 rounded-xl p-1">
             <Button
@@ -192,12 +191,12 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
         <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl bg-secondary/30 flex items-center justify-center shrink-0 overflow-hidden relative">
           {!imageError ? (
             <>
-              <Image
+              <img
                 src={getMenuItemImage(item.name) || "/placeholder.svg"}
                 alt={item.name}
-                fill
-                className="object-cover"
                 loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover rounded-xl"
                 onError={() => setImageError(true)}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
@@ -228,10 +227,11 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
         {quantity === 0 ? (
           <Button
             onClick={handleAdd}
-            className="w-full md:w-auto md:ml-auto md:flex bg-primary/15 text-primary hover:bg-primary hover:text-primary-foreground transition-neon h-11 px-5 font-semibold active-scale"
+            variant="ghost"
+            className="w-full md:w-auto md:ml-auto md:flex text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-neon h-9 px-4 font-medium text-sm active-scale"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Add to cart
+            <Plus className="w-4 h-4 mr-1.5" />
+            {t("menu_add_to_cart")}
           </Button>
         ) : (
           <div className="flex items-center justify-between md:justify-end gap-3">

@@ -20,7 +20,8 @@ export interface Session {
 export interface OrderItem {
   id: string;
   name: string;
-  price: number;
+  price: number; // Price in dollars (for menu display)
+  price_cents?: number; // Price in cents (for cart calculations)
   quantity: number;
   category: 'pizza' | 'sides' | 'drinks';
 }

@@ -126,7 +126,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setItems([]);
   }, []);
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // Calculate totals using cents for precision, fall back to price if price_cents not available
+  const subtotal = items.reduce((sum, item) => {
+    const priceInCents = item.price_cents ?? (item.price * 100);
+    return sum + (priceInCents * item.quantity) / 100;
+  }, 0);
   const total = subtotal; // Could add tax/delivery here
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
