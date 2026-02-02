@@ -3,6 +3,8 @@ import { BottomNav } from "@/components/layout/bottom-nav";
 import { ProfileContent } from "@/components/profile/profile-content";
 import { getSessionUserServer, getOrdersContext } from "@/lib/auth0";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProfilePage() {
   const user = await getSessionUserServer();
   const ordersContext = getOrdersContext(user);

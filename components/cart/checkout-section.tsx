@@ -46,6 +46,10 @@ export function CheckoutSection({ onClose }: CheckoutSectionProps) {
       toast.success("Order placed!", {
         description: `Order #${result.order.id.slice(-6)} is being prepared`,
       });
+      
+      // Dispatch event to refresh order history
+      window.dispatchEvent(new CustomEvent("order-placed"));
+      
       onClose?.();
     } catch {
       toast.error("Something went wrong", {

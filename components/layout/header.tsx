@@ -82,7 +82,19 @@ export function Header() {
                     <User className="w-4 h-4 text-primary" />
                   </div>
                   <span className="text-sm font-medium text-foreground truncate max-w-[100px]">
-                    {session.user?.email?.split("@")[0]}
+                    {(() => {
+                      const user = session.user;
+                      if (!user) return "Account";
+                      
+                      // Priority: given_name > name (first part) > email > "Account"
+                      if (user.given_name) return user.given_name;
+                      if (user.name) {
+                        // If name contains spaces, use only the first part
+                        return user.name.split(" ")[0];
+                      }
+                      if (user.email) return user.email;
+                      return "Account";
+                    })()}
                   </span>
                 </Link>
                 <Button
