@@ -18,7 +18,6 @@ export function normalizeOrderItemToCartItem(item: {
   const sku = item.sku || item.id;
   
   if (!sku) {
-    console.warn("[v0] Skipping item without sku or id:", item);
     return null;
   }
 
@@ -26,7 +25,6 @@ export function normalizeOrderItemToCartItem(item: {
   const quantity = Number(item.quantity ?? item.qty ?? 1);
   
   if (quantity <= 0) {
-    console.warn("[v0] Skipping item with invalid quantity:", item);
     return null;
   }
 
@@ -39,13 +37,11 @@ export function normalizeOrderItemToCartItem(item: {
     // Convert dollars to cents, rounding to avoid floating point issues
     priceCents = Math.round(Number(item.price) * 100);
   } else {
-    console.warn("[v0] Skipping item without price or price_cents:", item);
     return null;
   }
 
   // Validate price_cents is a valid number
   if (!Number.isFinite(priceCents) || priceCents < 0) {
-    console.warn("[v0] Skipping item with invalid price:", item);
     return null;
   }
 
