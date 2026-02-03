@@ -16,8 +16,8 @@ type Category = "pizza" | "sides" | "drinks";
 
 const categories: { id: Category; label: string; icon: React.ElementType }[] = [
   { id: "pizza", label: "Pizza", icon: Pizza },
-  { id: "sides", label: "Sides", icon: Drumstick },
-  { id: "drinks", label: "Drinks", icon: Coffee },
+  { id: "sides", label: "Acompañamientos", icon: Drumstick },
+  { id: "drinks", label: "Bebidas", icon: Coffee },
 ];
 
 export default function OrderPage() {
@@ -35,10 +35,10 @@ export default function OrderPage() {
         {/* Page header */}
         <div className="mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight mb-1">
-            Menu
+            Menú
           </h1>
           <p className="text-muted-foreground text-sm md:text-base">
-            Fresh ingredients, made to order
+            Ingredientes frescos, preparados al momento
           </p>
         </div>
 
@@ -83,9 +83,9 @@ export default function OrderPage() {
                 <div className="w-16 h-16 rounded-2xl bg-secondary/30 flex items-center justify-center mx-auto mb-4">
                   <Pizza className="w-8 h-8 text-muted-foreground/50" />
                 </div>
-                <p className="text-foreground font-semibold mb-1">Coming soon</p>
+                <p className="text-foreground font-semibold mb-1">Próximamente</p>
                 <p className="text-muted-foreground text-sm">
-                  We{"'"}re adding new items to this category
+                  Estamos agregando nuevos artículos a esta categoría
                 </p>
               </div>
             )}

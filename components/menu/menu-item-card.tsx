@@ -43,13 +43,13 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
   const handleDecrement = () => {
     if (quantity > 0) {
       updateQuantity(item.id, quantity - 1);
-      toast.success(`${item.name} quantity decreased to ${quantity - 1}`);
+      toast.success(`${displayName} cantidad disminuida a ${quantity - 1}`);
     }
   };
 
   const handleIncrement = () => {
     updateQuantity(item.id, quantity + 1);
-    toast.success(`${item.name} quantity increased to ${quantity + 1}`);
+    toast.success(`${displayName} cantidad aumentada a ${quantity + 1}`);
   };
 
   if (variant === "featured") {
@@ -105,7 +105,7 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
                 size="icon"
                 variant="ghost"
                 className="h-9 w-9 text-foreground hover:bg-secondary/50 rounded-lg active-scale"
-                aria-label={`Decrease ${item.name} quantity`}
+                aria-label={`Disminuir cantidad de ${item.name}`}
               >
                 <Minus className="w-4 h-4" />
               </Button>
@@ -114,7 +114,7 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
                 onClick={handleIncrement}
                 size="icon"
                 className="h-9 w-9 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg active-scale"
-                aria-label={`Increase ${item.name} quantity`}
+                aria-label={`Aumentar cantidad de ${item.name}`}
               >
                 <Plus className="w-4 h-4" />
               </Button>
@@ -167,7 +167,7 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
               size="icon"
               variant="ghost"
               className="h-8 w-8 text-foreground hover:bg-secondary/50 rounded-lg active-scale"
-              aria-label={`Decrease ${item.name} quantity`}
+              aria-label={`Disminuir cantidad de ${item.name}`}
             >
               <Minus className="w-3 h-3" />
             </Button>
@@ -176,7 +176,7 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
               onClick={handleIncrement}
               size="icon"
               className="h-8 w-8 bg-primary text-primary-foreground rounded-lg active-scale"
-              aria-label={`Increase ${item.name} quantity`}
+              aria-label={`Aumentar cantidad de ${item.name}`}
             >
               <Plus className="w-3 h-3" />
             </Button>
@@ -244,7 +244,7 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
                 size="icon"
                 variant="ghost"
                 className="h-10 w-10 text-foreground hover:bg-secondary/50 rounded-lg active-scale"
-                aria-label={`Decrease ${item.name} quantity`}
+                aria-label={`Disminuir cantidad de ${item.name}`}
               >
                 <Minus className="w-4 h-4" />
               </Button>
@@ -253,14 +253,14 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
                 onClick={handleIncrement}
                 size="icon"
                 className="h-10 w-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg active-scale"
-                aria-label={`Increase ${item.name} quantity`}
+                aria-label={`Aumentar cantidad de ${item.name}`}
               >
                 <Plus className="w-4 h-4" />
               </Button>
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Check className="w-4 h-4 text-green-400" />
-              <span>In cart</span>
+              <span>En el carrito</span>
             </div>
           </div>
         )}
