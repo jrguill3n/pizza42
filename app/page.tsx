@@ -3,6 +3,7 @@ import { BottomNav } from "@/components/layout/bottom-nav";
 import { HomeContent } from "@/components/home/home-content";
 import { getSessionUserServer, getOrdersContext, ORDERS_CONTEXT_CLAIM } from "@/lib/auth0.server";
 
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
