@@ -151,32 +151,50 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
   }
 
   const handleRepeatOrder = () => {
-    if (!lastOrder?.items) return;
+    // Guard: Check if last order exists
+    if (!lastOrder?.items || lastOrder.items.length === 0) {
+      toast.error("Aún no tienes pedidos para reordenar");
+      return;
+    }
+    
+    console.log("[v0] Reordering last order:", lastOrder);
     
     // Normalize last order items to canonical cart format
     const normalized = lastOrder.items
       .map((item) => {
         // Skip items missing required fields
-        if (!item.id || !item.price_cents) {
+        if (!item.id) {
+          console.log("[v0] Skipping item without id:", item);
           return null;
         }
         
-        return {
+        // Use price_cents if available, otherwise convert price to cents
+        const priceCents = item.price_cents 
+          ? Number(item.price_cents) 
+          : Math.round(Number(item.price ?? 0) * 100);
+        
+        const normalizedItem = {
           sku: item.id, // Map id to sku
           name: item.name,
           quantity: Number(item.quantity ?? 1),
-          price_cents: Number(item.price_cents ?? 0),
+          price_cents: priceCents,
         };
+        
+        console.log("[v0] Normalized item:", normalizedItem);
+        return normalizedItem;
       })
       .filter((item): item is OrderItem => item !== null);
     
-    // Replace cart contents entirely (reorder = repeat order)
+    console.log("[v0] Setting cart items:", normalized);
+    
+    // Replace cart contents entirely (clear previous cart, then add all items)
     setCartItems(normalized);
     
     toast.success("Pedido agregado al carrito", {
       description: "Tu último pedido está listo para ordenar",
     });
-    // Navigate to order page so user can review and checkout
+    
+    // Navigate to cart page so user can review items
     router.push("/order");
   };
 
