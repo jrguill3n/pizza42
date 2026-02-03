@@ -62,9 +62,12 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
               <Image
                 src={imageSrc}
                 alt={displayName}
-                fill
-                sizes="180px"
-                className="object-cover rounded-xl"
+                width={400}
+                height={400}
+                sizes="(max-width: 768px) 50vw, 25vw"
+                loading="lazy"
+                quality={75}
+                className="object-cover rounded-xl w-full h-full"
                 onError={() => setImageError(true)}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
@@ -133,9 +136,12 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
             <Image
               src={imageSrc}
               alt={displayName}
-              fill
-              sizes="48px"
-              className="object-cover rounded-lg"
+              width={400}
+              height={400}
+              sizes="(max-width: 768px) 50vw, 25vw"
+              loading="lazy"
+              quality={75}
+              className="object-cover rounded-lg w-full h-full"
               onError={() => setImageError(true)}
             />
           ) : (
@@ -197,9 +203,12 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
               <Image
                 src={imageSrc}
                 alt={displayName}
-                fill
-                sizes="(max-width: 768px) 80px, 96px"
-                className="object-cover rounded-xl"
+                width={400}
+                height={400}
+                sizes="(max-width: 768px) 50vw, 25vw"
+                loading="lazy"
+                quality={75}
+                className="object-cover rounded-xl w-full h-full"
                 onError={() => setImageError(true)}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
