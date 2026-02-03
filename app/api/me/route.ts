@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth0, getOrdersContextFromSession } from "@/lib/auth0";
+import { auth0, getOrdersContextFromSession } from "@/lib/auth0.server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
