@@ -38,6 +38,7 @@ export interface Order {
 
 export interface MenuItem {
   id: string;
+  sku: string; // SKU for image mapping (p1, s2, d4, etc.)
   name: string;
   description: string;
   price: number;
@@ -112,24 +113,24 @@ export function getTokenClaimsMock(user: User | null): Record<string, unknown> {
 // Mock menu items
 export const mockMenuItems: MenuItem[] = [
   // Pizzas
-  { id: 'p1', name: 'Pepperoni Supreme', description: 'Classic pepperoni with extra cheese and secret spices', price: 18.99, category: 'pizza' },
-  { id: 'p2', name: 'Margherita Neon', description: 'Fresh mozzarella, tomatoes, and basil on our signature crust', price: 16.99, category: 'pizza' },
-  { id: 'p3', name: 'Cyber BBQ Chicken', description: 'Grilled chicken, BBQ sauce, red onions, and cilantro', price: 19.99, category: 'pizza' },
-  { id: 'p4', name: 'Veggie Matrix', description: 'Bell peppers, mushrooms, olives, onions, and tomatoes', price: 17.99, category: 'pizza' },
-  { id: 'p5', name: 'Meat Override', description: 'Pepperoni, sausage, bacon, and ham loaded', price: 21.99, category: 'pizza' },
-  { id: 'p6', name: 'Hawaiian Glitch', description: 'Ham, pineapple, and bacon with a sweet chili drizzle', price: 18.99, category: 'pizza' },
+  { id: 'p1', sku: 'p1', name: 'Pepperoni Supreme', description: 'Classic pepperoni with extra cheese and secret spices', price: 18.99, category: 'pizza' },
+  { id: 'p2', sku: 'p2', name: 'Margherita Neon', description: 'Fresh mozzarella, tomatoes, and basil on our signature crust', price: 16.99, category: 'pizza' },
+  { id: 'p3', sku: 'p3', name: 'Cyber BBQ Chicken', description: 'Grilled chicken, BBQ sauce, red onions, and cilantro', price: 19.99, category: 'pizza' },
+  { id: 'p4', sku: 'p4', name: 'Veggie Matrix', description: 'Bell peppers, mushrooms, olives, onions, and tomatoes', price: 17.99, category: 'pizza' },
+  { id: 'p5', sku: 'p5', name: 'Meat Override', description: 'Pepperoni, sausage, bacon, and ham loaded', price: 21.99, category: 'pizza' },
+  { id: 'p6', sku: 'p6', name: 'Hawaiian Glitch', description: 'Ham, pineapple, and bacon with a sweet chili drizzle', price: 18.99, category: 'pizza' },
   
   // Sides
-  { id: 's1', name: 'Garlic Bread', description: 'Crispy bread with garlic butter and herbs', price: 5.99, category: 'sides' },
-  { id: 's2', name: 'Cheesy Bites', description: 'Bite-sized dough balls stuffed with mozzarella', price: 7.99, category: 'sides' },
-  { id: 's3', name: 'Wings x8', description: 'Crispy wings with your choice of sauce', price: 12.99, category: 'sides' },
-  { id: 's4', name: 'Caesar Salad', description: 'Fresh romaine, parmesan, croutons, and Caesar dressing', price: 8.99, category: 'sides' },
+  { id: 's1', sku: 's1', name: 'Garlic Bread', description: 'Crispy bread with garlic butter and herbs', price: 5.99, category: 'sides' },
+  { id: 's2', sku: 's2', name: 'Cheesy Bites', description: 'Bite-sized dough balls stuffed with mozzarella', price: 7.99, category: 'sides' },
+  { id: 's3', sku: 's3', name: 'Wings x8', description: 'Crispy wings with your choice of sauce', price: 12.99, category: 'sides' },
+  { id: 's4', sku: 's4', name: 'Caesar Salad', description: 'Fresh romaine, parmesan, croutons, and Caesar dressing', price: 8.99, category: 'sides' },
   
   // Drinks
-  { id: 'd1', name: 'Neon Cola', description: 'Our signature citrus-infused cola', price: 2.99, category: 'drinks' },
-  { id: 'd2', name: 'Sparkling Water', description: 'Refreshing sparkling mineral water', price: 1.99, category: 'drinks' },
-  { id: 'd3', name: 'Lemonade', description: 'Fresh-squeezed lemonade with a hint of mint', price: 3.49, category: 'drinks' },
-  { id: 'd4', name: 'Iced Tea', description: 'Cold-brewed black tea with lemon', price: 2.49, category: 'drinks' },
+  { id: 'd1', sku: 'd1', name: 'Neon Cola', description: 'Our signature citrus-infused cola', price: 2.99, category: 'drinks' },
+  { id: 'd2', sku: 'd2', name: 'Sparkling Water', description: 'Refreshing sparkling mineral water', price: 1.99, category: 'drinks' },
+  { id: 'd3', sku: 'd3', name: 'Lemonade', description: 'Fresh-squeezed lemonade with a hint of mint', price: 3.49, category: 'drinks' },
+  { id: 'd4', sku: 'd4', name: 'Iced Tea', description: 'Cold-brewed black tea with lemon', price: 2.49, category: 'drinks' },
 ];
 
 // Mock orders for order history
