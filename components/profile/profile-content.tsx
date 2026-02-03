@@ -152,7 +152,11 @@ export function ProfileContent({ user, ordersContext }: ProfileContentProps) {
         <div className="space-y-6">
           {/* Order History */}
           <div className="glass rounded-2xl p-6">
-            <OrderHistoryList userId={user.email} />
+            <OrderHistoryList 
+              userId={user.email} 
+              isAuthenticated={true}
+              emailVerified={user.email_verified}
+            />
           </div>
 
           {/* Segmentation Preview */}

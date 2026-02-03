@@ -139,6 +139,23 @@ export const copy = {
     profile_auth_email: "Correo y contraseña",
     profile_auth_social: "Inicio de sesión social",
     
+    // Order History States
+    orders_loading: "Cargando pedidos...",
+    orders_login_title: "Inicia sesión para ver tu historial",
+    orders_login_subtitle: "Accede a tus pedidos y a tu información de cuenta.",
+    orders_login_cta: "Iniciar sesión",
+    orders_signup_cta: "Crear cuenta",
+    orders_unverified_title: "Verifica tu correo para ver tu historial",
+    orders_unverified_subtitle: "Puedes iniciar sesión, pero necesitas verificar tu correo antes de ver tu historial de pedidos.",
+    orders_refresh_cta: "Actualizar",
+    orders_empty_title: "Aún no tienes pedidos",
+    orders_empty_subtitle: "Cuando hagas tu primer pedido, aparecerá aquí.",
+    orders_empty_cta: "Ver menú",
+    orders_error_title: "Error al cargar pedidos",
+    orders_error_subtitle: "Ocurrió un error inesperado. Por favor intenta de nuevo.",
+    orders_retry_cta: "Reintentar",
+    orders_history_title: "Historial de pedidos",
+    
     // Segmentación
     segment_new_customer: "Nuevo Cliente",
     segment_new_benefit: "10% de descuento en tu primer pedido",
