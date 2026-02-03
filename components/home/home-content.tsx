@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { MenuItemCard } from "@/components/menu/menu-item-card";
 import { useCart } from "@/components/providers/app-provider";
 import { mockMenuItems, type OrderItem } from "@/lib/mock-data";
+import { normalizeOrderItems } from "@/lib/cart-utils";
 import { toast } from "sonner";
 import type { Auth0User, OrdersContext } from "@/lib/auth0";
 import { getLoginUrl, getSignupUrl, getLogoutUrl } from "@/lib/auth0";
@@ -157,34 +158,15 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
       return;
     }
     
-    // Normalize last order items to canonical cart format
-    // Cart store expects: { id, sku, name, price_cents, quantity }
-    const normalized = lastOrder.items
-      .map((item) => {
-        // Skip items missing required fields
-        if (!item.id) {
-          return null;
-        }
-        
-        // Use price_cents if available, otherwise convert price to cents
-        const priceCents = item.price_cents 
-          ? Number(item.price_cents) 
-          : Math.round(Number(item.price ?? 0) * 100);
-        
-        // Include both id and sku fields for cart compatibility
-        const normalizedItem = {
-          id: item.id,           // Required for cart item identification
-          sku: item.id,          // Same as id for consistency
-          name: item.name,
-          quantity: Number(item.quantity ?? 1),
-          price_cents: priceCents,
-        };
-        
-        return normalizedItem;
-      })
-      .filter((item): item is OrderItem => item !== null);
+    // Normalize last order items to canonical cart format using shared utility
+    const normalized = normalizeOrderItems(lastOrder.items);
     
-    // Replace cart contents entirely (clear previous cart, then add all items)
+    if (normalized.length === 0) {
+      toast.error("No se pudieron agregar los artículos al carrito");
+      return;
+    }
+    
+    // Replace cart contents entirely with normalized items
     setCartItems(normalized);
     
     toast.success("Pedido agregado al carrito", {
