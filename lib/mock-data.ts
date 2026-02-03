@@ -59,8 +59,8 @@ export const mockUsers: Record<string, User> = {
       orders_count: 5,
       last_order_at: '2026-01-28T18:30:00Z',
       last_order_items: [
-        { id: 'p1', name: 'Pepperoni Supreme', price: 18.99, quantity: 1, category: 'pizza' },
-        { id: 's1', name: 'Garlic Bread', price: 5.99, quantity: 2, category: 'sides' },
+        { id: 'p1', name: 'Pepperoni Suprema', price: 18.99, quantity: 1, category: 'pizza' },
+        { id: 's1', name: 'Pan de Ajo', price: 5.99, quantity: 2, category: 'sides' },
       ],
     },
   },
@@ -113,24 +113,24 @@ export function getTokenClaimsMock(user: User | null): Record<string, unknown> {
 // Mock menu items
 export const mockMenuItems: MenuItem[] = [
   // Pizzas
-  { id: 'p1', sku: 'p1', name: 'Pepperoni Supreme', description: 'Pepperoni clásico con queso extra y especias secretas', price: 18.99, category: 'pizza' },
-  { id: 'p2', sku: 'p2', name: 'Margherita Neon', description: 'Mozzarella fresca, tomates y albahaca en nuestra masa signature', price: 16.99, category: 'pizza' },
-  { id: 'p3', sku: 'p3', name: 'Cyber BBQ Chicken', description: 'Pollo a la parrilla, salsa BBQ, cebollas rojas y cilantro', price: 19.99, category: 'pizza' },
+  { id: 'p1', sku: 'p1', name: 'Pepperoni Suprema', description: 'Pepperoni clásico con queso extra y especias secretas', price: 18.99, category: 'pizza' },
+  { id: 'p2', sku: 'p2', name: 'Margarita Neon', description: 'Mozzarella fresca, tomates y albahaca en nuestra masa signature', price: 16.99, category: 'pizza' },
+  { id: 'p3', sku: 'p3', name: 'Pollo BBQ 42', description: 'Pollo a la parrilla, salsa BBQ, cebollas rojas y cilantro', price: 19.99, category: 'pizza' },
   { id: 'p4', sku: 'p4', name: 'Veggie Matrix', description: 'Pimientos, champiñones, aceitunas, cebollas y tomates', price: 17.99, category: 'pizza' },
-  { id: 'p5', sku: 'p5', name: 'Meat Override', description: 'Cargada de pepperoni, salchicha, tocino y jamón', price: 21.99, category: 'pizza' },
+  { id: 'p5', sku: 'p5', name: 'La Carnívora', description: 'Cargada de pepperoni, salchicha, tocino y jamón', price: 21.99, category: 'pizza' },
   { id: 'p6', sku: 'p6', name: 'Hawaiian Glitch', description: 'Jamón, piña y tocino con salsa de chile dulce', price: 18.99, category: 'pizza' },
   
   // Sides
-  { id: 's1', sku: 's1', name: 'Garlic Bread', description: 'Pan crujiente con mantequilla de ajo y hierbas', price: 5.99, category: 'sides' },
-  { id: 's2', sku: 's2', name: 'Cheesy Bites', description: 'Bolitas de masa rellenas de mozzarella', price: 7.99, category: 'sides' },
-  { id: 's3', sku: 's3', name: 'Wings x8', description: 'Alitas crujientes con la salsa de tu elección', price: 12.99, category: 'sides' },
-  { id: 's4', sku: 's4', name: 'Caesar Salad', description: 'Lechuga romana fresca, parmesano, crutones y aderezo César', price: 8.99, category: 'sides' },
+  { id: 's1', sku: 's1', name: 'Pan de Ajo', description: 'Pan crujiente con mantequilla de ajo y hierbas', price: 5.99, category: 'sides' },
+  { id: 's2', sku: 's2', name: 'Bocados de Queso', description: 'Bolitas de masa rellenas de mozzarella', price: 7.99, category: 'sides' },
+  { id: 's3', sku: 's3', name: 'Alitas', description: 'Alitas crujientes con la salsa de tu elección', price: 12.99, category: 'sides' },
+  { id: 's4', sku: 's4', name: 'Ensalada César', description: 'Lechuga romana fresca, parmesano, crutones y aderezo César', price: 8.99, category: 'sides' },
   
   // Drinks
   { id: 'd1', sku: 'd1', name: 'Neon Cola', description: 'Nuestra cola signature con infusión de cítricos', price: 2.99, category: 'drinks' },
-  { id: 'd2', sku: 'd2', name: 'Sparkling Water', description: 'Agua mineral con gas refrescante', price: 1.99, category: 'drinks' },
-  { id: 'd3', sku: 'd3', name: 'Lemonade', description: 'Limonada recién exprimida con toque de menta', price: 3.49, category: 'drinks' },
-  { id: 'd4', sku: 'd4', name: 'Iced Tea', description: 'Té negro preparado en frío con limón', price: 2.49, category: 'drinks' },
+  { id: 'd2', sku: 'd2', name: 'Agua Mineral', description: 'Agua mineral con gas refrescante', price: 1.99, category: 'drinks' },
+  { id: 'd3', sku: 'd3', name: 'Limonada', description: 'Limonada recién exprimida con toque de menta', price: 3.49, category: 'drinks' },
+  { id: 'd4', sku: 'd4', name: 'Té Helado', description: 'Té negro preparado en frío con limón', price: 2.49, category: 'drinks' },
 ];
 
 // Mock orders for order history
@@ -138,8 +138,8 @@ export const mockOrders: Order[] = [
   {
     id: 'ord-001',
     items: [
-      { id: 'p1', name: 'Pepperoni Supreme', price: 18.99, quantity: 1, category: 'pizza' },
-      { id: 's1', name: 'Garlic Bread', price: 5.99, quantity: 2, category: 'sides' },
+      { id: 'p1', name: 'Pepperoni Suprema', price: 18.99, quantity: 1, category: 'pizza' },
+      { id: 's1', name: 'Pan de Ajo', price: 5.99, quantity: 2, category: 'sides' },
     ],
     total: 30.97,
     status: 'delivered',
@@ -148,7 +148,7 @@ export const mockOrders: Order[] = [
   {
     id: 'ord-002',
     items: [
-      { id: 'p3', name: 'Cyber BBQ Chicken', price: 19.99, quantity: 2, category: 'pizza' },
+      { id: 'p3', name: 'Pollo BBQ 42', price: 19.99, quantity: 2, category: 'pizza' },
       { id: 'd1', name: 'Neon Cola', price: 2.99, quantity: 3, category: 'drinks' },
     ],
     total: 48.95,
@@ -158,7 +158,7 @@ export const mockOrders: Order[] = [
   {
     id: 'ord-003',
     items: [
-      { id: 'p2', name: 'Margherita Neon', price: 16.99, quantity: 1, category: 'pizza' },
+      { id: 'p2', name: 'Margarita Neon', price: 16.99, quantity: 1, category: 'pizza' },
     ],
     total: 16.99,
     status: 'delivered',
@@ -201,10 +201,10 @@ export function applyLastOrderToCartMock(lastOrderItems: OrderItem[] | null): Or
 
 // Featured items for home page
 export const featuredItems: MenuItem[] = [
-  mockMenuItems[0], // Pepperoni Supreme
-  mockMenuItems[2], // Cyber BBQ Chicken
-  mockMenuItems[4], // Meat Override
-  mockMenuItems[7], // Cheesy Bites
+  mockMenuItems[0], // Pepperoni Suprema
+  mockMenuItems[2], // Pollo BBQ 42
+  mockMenuItems[4], // La Carnívora
+  mockMenuItems[7], // Bocados de Queso
 ];
 
 // Segmentation logic mock
