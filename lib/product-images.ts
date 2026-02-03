@@ -4,9 +4,9 @@
  */
 
 /**
- * Maps a product SKU to its corresponding image path in /public
+ * Maps a product SKU to its corresponding image path in /public/images
  * @param sku - Product SKU (e.g., 'p1', 's2', 'd4')
- * @returns Image path like '/p1.jpg', '/s2.jpg', '/d4.jpg' or '/placeholder.jpg'
+ * @returns Image path like '/images/p1.jpg', '/images/s2.jpg', '/images/d4.jpg' or '/placeholder.jpg'
  */
 export function getProductImageSrc(sku: string | undefined): string {
   if (!sku) {
@@ -16,7 +16,7 @@ export function getProductImageSrc(sku: string | undefined): string {
   // Normalize SKU to lowercase for consistent matching
   const normalizedSku = sku.toLowerCase().trim();
 
-  // Map SKUs to image files
+  // Map SKUs to image files in /images folder
   // Pizzas: p1.jpg through p6.jpg
   // Sides: s1.jpg through s4.jpg
   // Drinks: d1.jpg through d4.jpg
@@ -38,7 +38,7 @@ export function getProductImageSrc(sku: string | undefined): string {
   ];
 
   if (validSkus.includes(normalizedSku)) {
-    return `/${normalizedSku}.jpg`;
+    return `/images/${normalizedSku}.jpg`;
   }
 
   // Fallback for unknown SKUs

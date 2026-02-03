@@ -62,9 +62,12 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
               <Image
                 src={imageSrc || "/placeholder.svg"}
                 alt={displayName}
-                fill
-                sizes="180px"
+                width={400}
+                height={400}
+                sizes="(max-width: 768px) 50vw, 25vw"
                 className="object-cover rounded-xl"
+                loading="lazy"
+                priority={false}
                 onError={() => setImageError(true)}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
@@ -130,14 +133,17 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
       <div className="flex items-center gap-3 p-3 glass-elevated rounded-xl transition-neon hover:bg-secondary/30">
         <div className="w-12 h-12 rounded-lg bg-secondary/40 flex items-center justify-center shrink-0 overflow-hidden relative">
           {!imageError ? (
-            <Image
-              src={imageSrc || "/placeholder.svg"}
-              alt={displayName}
-              fill
-              sizes="48px"
-              className="object-cover rounded-lg"
-              onError={() => setImageError(true)}
-            />
+              <Image
+                src={imageSrc}
+                alt={displayName}
+                width={400}
+                height={400}
+                sizes="(max-width: 768px) 50vw, 25vw"
+                className="object-cover rounded-xl"
+                loading="lazy"
+                priority={false}
+                onError={() => setImageError(true)}
+              />
           ) : (
             <span className="text-base font-bold text-primary/70">{categoryLetter}</span>
           )}
@@ -197,9 +203,12 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
               <Image
                 src={imageSrc || "/placeholder.svg"}
                 alt={displayName}
-                fill
-                sizes="(max-width: 768px) 80px, 96px"
+                width={400}
+                height={400}
+                sizes="(max-width: 768px) 50vw, 25vw"
                 className="object-cover rounded-xl"
+                loading="lazy"
+                priority={false}
                 onError={() => setImageError(true)}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
