@@ -157,14 +157,12 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
       return;
     }
     
-    console.log("[v0] Reordering last order:", lastOrder);
-    
     // Normalize last order items to canonical cart format
+    // Cart store expects: { id, sku, name, price_cents, quantity }
     const normalized = lastOrder.items
       .map((item) => {
         // Skip items missing required fields
         if (!item.id) {
-          console.log("[v0] Skipping item without id:", item);
           return null;
         }
         
@@ -173,19 +171,18 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
           ? Number(item.price_cents) 
           : Math.round(Number(item.price ?? 0) * 100);
         
+        // Include both id and sku fields for cart compatibility
         const normalizedItem = {
-          sku: item.id, // Map id to sku
+          id: item.id,           // Required for cart item identification
+          sku: item.id,          // Same as id for consistency
           name: item.name,
           quantity: Number(item.quantity ?? 1),
           price_cents: priceCents,
         };
         
-        console.log("[v0] Normalized item:", normalizedItem);
         return normalizedItem;
       })
       .filter((item): item is OrderItem => item !== null);
-    
-    console.log("[v0] Setting cart items:", normalized);
     
     // Replace cart contents entirely (clear previous cart, then add all items)
     setCartItems(normalized);
