@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth0 } from "@/lib/auth0.server";
+import { auth0 } from "@/lib/auth0";
 import { getAccessTokenForRequest } from "@/lib/getAccessTokenForRequest";
 
 export const runtime = "nodejs";
