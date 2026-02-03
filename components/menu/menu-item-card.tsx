@@ -62,9 +62,12 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
               <Image
                 src={imageSrc || "/placeholder.svg"}
                 alt={displayName}
-                fill
-                sizes="180px"
+                width={400}
+                height={400}
+                sizes="(max-width: 768px) 50vw, 25vw"
                 className="object-cover rounded-xl"
+                loading="lazy"
+                priority={false}
                 onError={() => setImageError(true)}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
@@ -133,9 +136,12 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
             <Image
               src={imageSrc || "/placeholder.svg"}
               alt={displayName}
-              fill
-              sizes="48px"
+              width={400}
+              height={400}
+              sizes="(max-width: 768px) 50vw, 25vw"
               className="object-cover rounded-lg"
+              loading="lazy"
+              priority={false}
               onError={() => setImageError(true)}
             />
           ) : (
@@ -197,9 +203,12 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
               <Image
                 src={imageSrc || "/placeholder.svg"}
                 alt={displayName}
-                fill
-                sizes="(max-width: 768px) 80px, 96px"
+                width={400}
+                height={400}
+                sizes="(max-width: 768px) 50vw, 25vw"
                 className="object-cover rounded-xl"
+                loading="lazy"
+                priority={false}
                 onError={() => setImageError(true)}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
