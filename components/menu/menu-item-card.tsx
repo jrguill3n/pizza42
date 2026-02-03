@@ -57,10 +57,10 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
       <div className="glass-elevated rounded-2xl p-4 min-w-[180px] w-[180px] flex flex-col transition-neon hover:neon-glow-subtle group">
         {/* Image */}
         <div className="w-full aspect-square rounded-xl bg-secondary/30 mb-3 flex items-center justify-center overflow-hidden relative">
-          {!imageError ? (
+          {!imageError && imageSrc ? (
             <>
               <Image
-                src={imageSrc || "/placeholder.svg"}
+                src={imageSrc}
                 alt={displayName}
                 fill
                 sizes="180px"
@@ -129,9 +129,9 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
     return (
       <div className="flex items-center gap-3 p-3 glass-elevated rounded-xl transition-neon hover:bg-secondary/30">
         <div className="w-12 h-12 rounded-lg bg-secondary/40 flex items-center justify-center shrink-0 overflow-hidden relative">
-          {!imageError ? (
+          {!imageError && imageSrc ? (
             <Image
-              src={imageSrc || "/placeholder.svg"}
+              src={imageSrc}
               alt={displayName}
               fill
               sizes="48px"
@@ -192,10 +192,10 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
       <div className="flex gap-4">
         {/* Image */}
         <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl bg-secondary/30 flex items-center justify-center shrink-0 overflow-hidden relative">
-          {!imageError ? (
+          {!imageError && imageSrc ? (
             <>
               <Image
-                src={imageSrc || "/placeholder.svg"}
+                src={imageSrc}
                 alt={displayName}
                 fill
                 sizes="(max-width: 768px) 80px, 96px"
