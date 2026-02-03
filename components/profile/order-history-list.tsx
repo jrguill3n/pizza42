@@ -108,6 +108,7 @@ export function OrderHistoryList({ userId, isAuthenticated = false, emailVerifie
       const ordersData = await ordersRes.json();
       setOrders(ordersData.orders || []);
     } catch (err: any) {
+      console.error("[v0] Failed to load orders:", err);
       setError(err.message || "Failed to load orders");
     } finally {
       setIsLoading(false);
@@ -121,6 +122,7 @@ export function OrderHistoryList({ userId, isAuthenticated = false, emailVerifie
   // Listen for order-placed events
   useEffect(() => {
     const handleOrderPlaced = () => {
+      console.log("[v0] Order placed event received, refreshing order history");
       setRefreshTrigger((prev) => prev + 1);
     };
 

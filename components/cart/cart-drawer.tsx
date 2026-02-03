@@ -175,14 +175,11 @@ export function CartDrawer() {
                       <div className="w-14 h-14 rounded-xl bg-secondary/40 flex items-center justify-center shrink-0 overflow-hidden relative">
                         {!hasImageError ? (
                           <Image
-                            src={imageSrc}
+                            src={imageSrc || "/placeholder.svg"}
                             alt={item.name}
-                            width={400}
-                            height={400}
+                            fill
                             sizes="56px"
                             className="object-cover rounded-xl"
-                            loading="lazy"
-                            priority={false}
                             onError={() => handleImageError(itemId)}
                           />
                         ) : (

@@ -69,14 +69,11 @@ export function CartPanel() {
                   <div className="w-12 h-12 rounded-xl bg-secondary/40 flex items-center justify-center shrink-0 overflow-hidden relative">
                     {!hasImageError ? (
                       <Image
-                        src={imageSrc}
+                        src={imageSrc || "/placeholder.svg"}
                         alt={item.name}
-                        width={400}
-                        height={400}
+                        fill
                         sizes="48px"
                         className="object-cover rounded-xl"
-                        loading="lazy"
-                        priority={false}
                         onError={() => handleImageError(itemId)}
                       />
                     ) : (
