@@ -1,17 +1,25 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
 import { ShoppingCart, Plus, Minus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/providers/app-provider";
 import { CheckoutSection } from "./checkout-section";
+import { getProductImageSrc, getCategoryLetter } from "@/lib/product-images";
 import { toast } from "sonner";
 
 export function CartPanel() {
   const { items, updateQuantity, removeItem, subtotal, total, itemCount } = useCart();
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   const handleRemove = (itemId: string, itemName: string) => {
     removeItem(itemId);
     toast.info(`${itemName} removed`);
+  };
+
+  const handleImageError = (itemId: string) => {
+    setImageErrors((prev) => ({ ...prev, [itemId]: true }));
   };
 
   return (
@@ -48,17 +56,31 @@ export function CartPanel() {
             {items.map((item) => {
               const itemId = item.sku || item.id;
               const itemPrice = ((item.price_cents ?? 0) * item.quantity) / 100;
+              const imageSrc = getProductImageSrc(itemId);
+              const categoryLetter = getCategoryLetter(itemId);
+              const hasImageError = imageErrors[itemId];
               
               return (
                 <div
                   key={itemId}
                   className="flex items-start gap-3 p-3 rounded-xl bg-secondary/20 border border-border/10 transition-colors hover:bg-secondary/30"
                 >
-                  {/* Item icon */}
-                  <div className="w-12 h-12 rounded-xl bg-secondary/40 flex items-center justify-center shrink-0">
-                    <span className="text-base font-bold text-primary/70">
-                      {item.category === "pizza" ? "P" : item.category === "sides" ? "S" : "D"}
-                    </span>
+                  {/* Item image */}
+                  <div className="w-12 h-12 rounded-xl bg-secondary/40 flex items-center justify-center shrink-0 overflow-hidden relative">
+                    {!hasImageError ? (
+                      <Image
+                        src={imageSrc || "/placeholder.svg"}
+                        alt={item.name}
+                        fill
+                        sizes="48px"
+                        className="object-cover rounded-xl"
+                        onError={() => handleImageError(itemId)}
+                      />
+                    ) : (
+                      <span className="text-base font-bold text-primary/70">
+                        {categoryLetter}
+                      </span>
+                    )}
                   </div>
 
                   {/* Item details */}

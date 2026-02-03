@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import Image from "next/image";
 import { ShoppingCart, X, Plus, Minus, Trash2, ChevronUp, Lock, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { getProductImageSrc, getCategoryLetter } from "@/lib/product-images";
 import {
   Dialog,
   DialogContent,
@@ -20,8 +22,13 @@ import { t } from "@/lib/copy";
 export function CartDrawer() {
   const [isOpen, setIsOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const { items, updateQuantity, removeItem, subtotal, total, itemCount } = useCart();
   const { session, login } = useAuth();
+
+  const handleImageError = (itemId: string) => {
+    setImageErrors((prev) => ({ ...prev, [itemId]: true }));
+  };
 
   const handleRemove = useCallback((itemId: string, itemName: string) => {
     removeItem(itemId);
@@ -155,17 +162,31 @@ export function CartDrawer() {
                 {items.map((item) => {
                   const itemId = item.sku || item.id;
                   const itemPrice = ((item.price_cents ?? 0) * item.quantity) / 100;
+                  const imageSrc = getProductImageSrc(itemId);
+                  const categoryLetter = getCategoryLetter(itemId);
+                  const hasImageError = imageErrors[itemId];
                   
                   return (
                     <div
                       key={itemId}
                       className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/20 border border-border/20"
                     >
-                      {/* Item visual */}
-                      <div className="w-14 h-14 rounded-xl bg-secondary/40 flex items-center justify-center shrink-0">
-                        <span className="text-lg font-bold text-primary/80">
-                          {item.category === "pizza" ? "P" : item.category === "sides" ? "S" : "D"}
-                        </span>
+                      {/* Item image */}
+                      <div className="w-14 h-14 rounded-xl bg-secondary/40 flex items-center justify-center shrink-0 overflow-hidden relative">
+                        {!hasImageError ? (
+                          <Image
+                            src={imageSrc || "/placeholder.svg"}
+                            alt={item.name}
+                            fill
+                            sizes="56px"
+                            className="object-cover rounded-xl"
+                            onError={() => handleImageError(itemId)}
+                          />
+                        ) : (
+                          <span className="text-lg font-bold text-primary/80">
+                            {categoryLetter}
+                          </span>
+                        )}
                       </div>
 
                       {/* Item details */}

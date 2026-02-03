@@ -1,19 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Plus, Minus, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/providers/app-provider";
 import type { MenuItem } from "@/lib/mock-data";
+import { getProductImageSrc, getCategoryLetter } from "@/lib/product-images";
 import { toast } from "sonner";
 import { t, MENU_NAME_ES } from "@/lib/copy";
-
-// Helper to generate Unsplash image URLs
-function getMenuItemImage(name: string) {
-  const q = name.toLowerCase().replace(/[^a-z0-9]+/g, ",");
-  return `https://source.unsplash.com/600x400/?${q},food`;
-}
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -29,7 +25,8 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
   // Get Spanish display name, fallback to original
   const displayName = MENU_NAME_ES[item.id] ?? item.name;
 
-  const categoryLetter = item.category === "pizza" ? "P" : item.category === "sides" ? "S" : "D";
+  const imageSrc = getProductImageSrc(item.sku || item.id);
+  const categoryLetter = getCategoryLetter(item.sku || item.id);
 
   const handleAdd = () => {
     addItem({
@@ -62,12 +59,12 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
         <div className="w-full aspect-square rounded-xl bg-secondary/30 mb-3 flex items-center justify-center overflow-hidden relative">
           {!imageError ? (
             <>
-              <img
-                src={getMenuItemImage(item.name) || "/placeholder.svg"}
-                alt={item.name}
-                loading="lazy"
-                decoding="async"
-                className="w-full h-full object-cover rounded-xl"
+              <Image
+                src={imageSrc || "/placeholder.svg"}
+                alt={displayName}
+                fill
+                sizes="180px"
+                className="object-cover rounded-xl"
                 onError={() => setImageError(true)}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
@@ -131,14 +128,14 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
   if (variant === "compact") {
     return (
       <div className="flex items-center gap-3 p-3 glass-elevated rounded-xl transition-neon hover:bg-secondary/30">
-        <div className="w-12 h-12 rounded-lg bg-secondary/40 flex items-center justify-center shrink-0 overflow-hidden">
+        <div className="w-12 h-12 rounded-lg bg-secondary/40 flex items-center justify-center shrink-0 overflow-hidden relative">
           {!imageError ? (
-            <img
-              src={getMenuItemImage(item.name) || "/placeholder.svg"}
-              alt={item.name}
-              loading="lazy"
-              decoding="async"
-              className="w-full h-full object-cover rounded-lg"
+            <Image
+              src={imageSrc || "/placeholder.svg"}
+              alt={displayName}
+              fill
+              sizes="48px"
+              className="object-cover rounded-lg"
               onError={() => setImageError(true)}
             />
           ) : (
@@ -197,12 +194,12 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
         <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl bg-secondary/30 flex items-center justify-center shrink-0 overflow-hidden relative">
           {!imageError ? (
             <>
-              <img
-                src={getMenuItemImage(item.name) || "/placeholder.svg"}
-                alt={item.name}
-                loading="lazy"
-                decoding="async"
-                className="w-full h-full object-cover rounded-xl"
+              <Image
+                src={imageSrc || "/placeholder.svg"}
+                alt={displayName}
+                fill
+                sizes="(max-width: 768px) 80px, 96px"
+                className="object-cover rounded-xl"
                 onError={() => setImageError(true)}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
