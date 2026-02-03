@@ -1,110 +1,162 @@
-# Pizza 42
+# 🍕 Pizza42 — Auth0 CIAM Reference Implementation
 
-A demo pizza ordering app showcasing Auth0 integration patterns for identity-driven applications.
+Pizza42 is a modern, consumer-style pizza ordering application built as a **reference implementation for Auth0 (Okta CIAM)**.
 
-## What This App Demonstrates
+It demonstrates how to design and implement a secure, scalable, and user-friendly customer identity platform using:
 
-- **Auth0 Authentication** - Login with Google (or other social/DB connections)
-- **Custom Scopes** - `read:orders` and `create:orders` for API authorization
-- **User Metadata Storage** - Order history stored in Auth0 `user_metadata`
-- **Custom Claims** - `https://pizza42.example/orders_context` enriched via Auth0 Action
-- **Email Verification Gating** - Unverified users cannot place orders
-- **Token Refresh Flow** - Re-login to refresh claims after placing orders
+- Universal Login
+- JWT-protected APIs with scopes
+- Post-login Actions
+- Custom claims
+- User metadata
+- Token-based personalization
+- Modern Next.js App Router architecture
 
-## Local Setup
+This project intentionally goes beyond a basic authentication demo and focuses on **real-world CIAM patterns** found in production consumer applications.
 
-1. Clone the repository and install dependencies:
-   \`\`\`bash
-   npm install
-   \`\`\`
+---
 
-2. Copy `.env.example` to `.env.local` and fill in your Auth0 credentials:
-   \`\`\`bash
-   cp .env.example .env.local
-   \`\`\`
+## 🔗 Live Demo
 
-3. Configure Auth0:
-   - Create an Auth0 Application (Regular Web Application)
-   - Add `http://localhost:3000/auth/callback` to Allowed Callback URLs
-   - Add `http://localhost:3000` to Allowed Logout URLs
-   - Create an API with identifier matching `AUTH0_AUDIENCE`
-   - Add scopes: `read:orders`, `create:orders`
-   - Create a Machine-to-Machine app for Management API access
+https://v0-pizza42.vercel.app
 
-4. Add an Auth0 Action (Login flow) to enrich tokens with order context:
-   \`\`\`javascript
-   exports.onExecutePostLogin = async (event, api) => {
-     const namespace = 'https://pizza42.example';
-     const metadata = event.user.user_metadata || {};
-     
-     api.idToken.setCustomClaim(`${namespace}/orders_context`, {
-       orders_count: metadata.orders_count || 0,
-       last_order_at: metadata.last_order_at || null,
-       last_order: metadata.last_order || null
-     });
-   };
-   \`\`\`
+> UI is in Spanish to simulate a LATAM consumer product.  
+> Documentation is in English for technical review.
 
-5. Run the development server:
-   \`\`\`bash
-   npm run dev
-   \`\`\`
+---
 
-## Required Environment Variables
+## 🎯 What This Demonstrates (Auth0 CIAM Capabilities)
 
-| Variable | Description |
-|----------|-------------|
-| `AUTH0_SECRET` | Random string for session encryption (min 32 chars) |
-| `AUTH0_BASE_URL` | App URL (e.g., `http://localhost:3000`) |
-| `AUTH0_ISSUER_BASE_URL` | Auth0 tenant URL (e.g., `https://your-tenant.auth0.com`) |
-| `AUTH0_CLIENT_ID` | Application client ID |
-| `AUTH0_CLIENT_SECRET` | Application client secret |
-| `AUTH0_AUDIENCE` | API identifier for access tokens |
-| `AUTH0_MGMT_CLIENT_ID` | M2M app client ID for Management API |
-| `AUTH0_MGMT_CLIENT_SECRET` | M2M app client secret |
+- Auth0 Universal Login (DB + Social)
+- Session-based authentication
+- Secure access token issuance with audience & scopes
+- JWT validation in server-side APIs
+- API authorization using scopes:
+  - `read:orders`
+  - `create:orders`
+- Saving last orders into `user_metadata`
+- Injecting order context into ID token via Post-Login Action
+- Custom namespaced claims
+- Gating functionality based on `email_verified`
+- Token-driven personalization
 
-## Demo Script
+---
 
-### 1. Unverified User Flow
-1. Sign up with a new email/password account
-2. Skip email verification
-3. Add items to cart and attempt checkout
-4. Observe: "Email verification required" banner appears, Place Order is blocked
+## 🧩 Architecture
 
-### 2. Verified User Flow
-1. Verify your email (check inbox for verification link)
-2. Log out and log back in to refresh session
-3. Add items to cart and place order
-4. Observe: Order succeeds, toast confirmation appears
+```
+Browser
+  ↓
+Next.js App Router (Client Components)
+  ↓
+Auth0 SDK (Session)
+  ↓
+/api/auth/token → Access Token
+  ↓
+/api/orders (Protected API)
+  ↓
+Auth0 Management API
+  ↓
+User Metadata
+```
 
-### 3. Claims Refresh Flow
-1. After placing an order, go to Profile page
-2. Check "Token Claims" section - `orders_context` shows stale data
-3. Click "Re-login to refresh claims"
-4. After re-authentication, observe updated `orders_count` and `last_order`
+**Separation of concerns:**
 
-### 4. Repeat Order Flow
-1. On Home page, logged-in users with past orders see "Repeat Last Order" card
-2. Click "Reorder now" to prefill cart with previous items
-3. Proceed to checkout
+- Client-safe Auth0 code → `lib/auth0.ts`
+- Server-only Auth0 code → `lib/auth0.server.ts`
+- JWT validation happens server-side
+- No secrets exposed to client
 
-## Architecture
+---
 
-\`\`\`
-/app
-  /auth/[auth0]     → Auth0 route handler (login, logout, callback)
-  /api/auth/token   → Returns access token for API calls
-  /api/orders       → Protected orders API (GET/POST)
-  /order            → Menu and cart page
-  /profile          → User profile with claims viewer
+## 👤 User Flows
 
-/lib
-  /auth0.ts         → Session helpers and type definitions
-  /auth.ts          → JWT verification with JWKS
-  /mgmt.ts          → Auth0 Management API client
-  /api-client.ts    → Client-side API utilities
-\`\`\`
+### Login
 
-## License
+- User clicks "Iniciar sesión"
+- Redirected to Auth0 Universal Login
+- Session established
 
-MIT
+### View Menu
+
+- Public catalog loads
+- Prices resolved from catalog map
+
+### Place Order
+
+- Client requests access token
+- Calls protected `/api/orders`
+- JWT validated
+- Scope `create:orders` required
+- Order saved to user_metadata
+
+### Reorder Last Order
+
+- Last orders read from ID token custom claim
+- Cart rebuilt from SKU price map
+- User can instantly reorder
+
+---
+
+## 🔐 Security Model
+
+- All sensitive operations happen server-side
+- APIs protected by JWT validation
+- Scopes enforced
+- Namespaced custom claims
+- No trusting client-provided prices
+- Orders rebuilt from catalog SKUs
+
+---
+
+## 🛠 Tech Stack
+
+- Next.js 16 (App Router)
+- React 19
+- Auth0 (Okta CIAM)
+- TypeScript
+- Tailwind CSS
+- Vercel
+
+---
+
+## 🚀 Local Development
+
+```bash
+git clone https://github.com/jrguill3n/pizza42
+cd pizza42
+npm install
+npm run dev
+```
+
+Create `.env.local`:
+
+```bash
+AUTH0_DOMAIN=
+AUTH0_CLIENT_ID=
+AUTH0_CLIENT_SECRET=
+AUTH0_AUDIENCE=
+AUTH0_ISSUER_BASE_URL=
+AUTH0_BASE_URL=http://localhost:3000
+```
+
+---
+
+## 📝 Notes for Reviewers
+
+This project intentionally models patterns used in real consumer platforms:
+
+- Token-driven personalization
+- Backend-enforced authorization
+- Clear client/server separation
+- Minimal surface area for secrets
+- Scalable identity architecture
+
+The goal is to demonstrate how a Solutions Engineer designs CIAM, not just how they wire up login.
+
+---
+
+## 👨‍💻 Author
+
+Ramon Guillén  
+Senior Solutions Engineer / Solutions Architect
