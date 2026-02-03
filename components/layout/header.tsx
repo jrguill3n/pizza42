@@ -121,16 +121,16 @@ export function Header() {
                   <span className="text-sm font-medium text-foreground truncate max-w-[100px]">
                     {(() => {
                       const user = session.user;
-                      if (!user) return "Account";
+                      if (!user) return "Cuenta";
                       
-                      // Priority: given_name > name (first part) > email > "Account"
+                      // Priority: given_name > name (first part) > email > "Cuenta"
                       if (user.given_name) return user.given_name;
                       if (user.name) {
                         // If name contains spaces, use only the first part
                         return user.name.split(" ")[0];
                       }
                       if (user.email) return user.email;
-                      return "Account";
+                      return "Cuenta";
                     })()}
                   </span>
                 </Link>

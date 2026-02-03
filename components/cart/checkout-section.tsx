@@ -52,15 +52,15 @@ export function CheckoutSection({ onClose }: CheckoutSectionProps) {
           return;
         }
         
-        toast.error("Something went wrong", {
+        toast.error("Algo salió mal", {
           description: result.error,
         });
         return;
       }
       
       clearCart();
-      toast.success("Order placed!", {
-        description: `Order #${result.order.id.slice(-6)} is being prepared`,
+      toast.success("¡Pedido realizado!", {
+        description: `Pedido #${result.order.id.slice(-6)} está siendo preparado`,
       });
       
       // Dispatch event to refresh order history
@@ -68,8 +68,8 @@ export function CheckoutSection({ onClose }: CheckoutSectionProps) {
       
       onClose?.();
     } catch {
-      toast.error("Something went wrong", {
-        description: "Please try again",
+      toast.error("Algo salió mal", {
+        description: "Por favor intenta de nuevo",
       });
     } finally {
       setIsPlacing(false);

@@ -21,7 +21,7 @@ export function BottomNav() {
     <nav
       className="md:hidden fixed bottom-0 left-0 right-0 z-50"
       role="navigation"
-      aria-label="Main navigation"
+      aria-label="Navegación principal"
     >
       {/* Gradient fade above nav for content bleed */}
       <div className="absolute -top-6 left-0 right-0 h-6 bg-gradient-to-t from-background to-transparent pointer-events-none" />

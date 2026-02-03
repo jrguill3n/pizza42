@@ -69,7 +69,7 @@ export function CartDrawer() {
       {/* Floating cart button - positioned above bottom nav */}
       <button
         onClick={handleCartClick}
-        aria-label={`Open cart with ${itemCount} items`}
+        aria-label={`Abrir carrito con ${itemCount} artículos`}
         className={cn(
           "fixed bottom-24 right-4 z-40 md:hidden",
           "w-16 h-16 rounded-2xl bg-primary text-primary-foreground",
@@ -117,7 +117,7 @@ export function CartDrawer() {
           <button
             onClick={handleClose}
             className="w-full flex flex-col items-center pt-3 pb-2 cursor-pointer"
-            aria-label="Close cart"
+            aria-label="Cerrar carrito"
           >
             <div className="w-10 h-1 rounded-full bg-muted-foreground/40 mb-1" />
             <ChevronUp className="w-4 h-4 text-muted-foreground/60" />
@@ -130,16 +130,16 @@ export function CartDrawer() {
                 <ShoppingCart className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-foreground tracking-tight">Your Cart</h2>
+                <h2 className="text-lg font-bold text-foreground tracking-tight">Tu Carrito</h2>
                 <p className="text-sm text-muted-foreground">
-                  {itemCount} {itemCount === 1 ? "item" : "items"}
+                  {itemCount} {itemCount === 1 ? "artículo" : "artículos"}
                 </p>
               </div>
             </div>
             <button
               onClick={handleClose}
               className="p-2.5 rounded-xl hover:bg-secondary/50 transition-colors touch-target"
-              aria-label="Close cart"
+              aria-label="Cerrar carrito"
             >
               <X className="w-5 h-5 text-muted-foreground" />
             </button>
@@ -152,9 +152,9 @@ export function CartDrawer() {
                 <div className="w-20 h-20 rounded-2xl bg-secondary/30 flex items-center justify-center mx-auto mb-5">
                   <ShoppingCart className="w-10 h-10 text-muted-foreground/50" />
                 </div>
-                <p className="text-foreground font-semibold text-lg mb-1">Nothing here yet</p>
+                <p className="text-foreground font-semibold text-lg mb-1">Nada aquí todavía</p>
                 <p className="text-muted-foreground text-sm leading-relaxed max-w-[200px] mx-auto">
-                  Tap the + button on any item to start building your order
+                  Toca el botón + en cualquier artículo para comenzar tu pedido
                 </p>
               </div>
             ) : (
@@ -206,7 +206,7 @@ export function CartDrawer() {
                           size="icon"
                           variant="ghost"
                           className="h-9 w-9 text-foreground hover:bg-secondary/50 rounded-lg"
-                          aria-label={`Decrease ${item.name} quantity`}
+                          aria-label={`Disminuir cantidad de ${item.name}`}
                         >
                           <Minus className="w-4 h-4" />
                         </Button>
@@ -218,7 +218,7 @@ export function CartDrawer() {
                         size="icon"
                         variant="ghost"
                         className="h-9 w-9 text-foreground hover:bg-secondary/50 rounded-lg"
-                        aria-label={`Increase ${item.name} quantity`}
+                        aria-label={`Aumentar cantidad de ${item.name}`}
                       >
                         <Plus className="w-4 h-4" />
                       </Button>
@@ -230,7 +230,7 @@ export function CartDrawer() {
                         size="icon"
                         variant="ghost"
                         className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg shrink-0"
-                        aria-label={`Remove ${item.name} from cart`}
+                        aria-label={`Eliminar ${item.name} del carrito`}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -251,8 +251,8 @@ export function CartDrawer() {
                   <span className="text-foreground font-medium">${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Delivery</span>
-                  <span className="text-green-400 font-medium">Free</span>
+                  <span className="text-muted-foreground">Entrega</span>
+                  <span className="text-green-400 font-medium">Gratis</span>
                 </div>
                 <div className="h-px bg-border/30 my-2" />
                 <div className="flex justify-between items-baseline">

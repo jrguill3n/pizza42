@@ -31,9 +31,9 @@ export function CartPanel() {
             <ShoppingCart className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-foreground tracking-tight">Your Cart</h2>
+            <h2 className="text-lg font-bold text-foreground tracking-tight">Tu Carrito</h2>
             <p className="text-sm text-muted-foreground">
-              {itemCount === 0 ? "Empty" : `${itemCount} ${itemCount === 1 ? "item" : "items"}`}
+              {itemCount === 0 ? "Vacío" : `${itemCount} ${itemCount === 1 ? "artículo" : "artículos"}`}
             </p>
           </div>
         </div>
@@ -46,9 +46,9 @@ export function CartPanel() {
             <div className="w-18 h-18 rounded-2xl bg-secondary/30 flex items-center justify-center mx-auto mb-5 w-[72px] h-[72px]">
               <ShoppingCart className="w-9 h-9 text-muted-foreground/40" />
             </div>
-            <p className="text-foreground font-semibold mb-1">Your cart is empty</p>
+            <p className="text-foreground font-semibold mb-1">Tu carrito está vacío</p>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-[200px] mx-auto">
-              Add items from the menu to get started
+              Agrega artículos del menú para comenzar
             </p>
           </div>
         ) : (
@@ -97,7 +97,7 @@ export function CartPanel() {
                         size="icon"
                         variant="ghost"
                         className="h-7 w-7 text-foreground hover:bg-secondary/50 rounded-md"
-                        aria-label={`Decrease ${item.name} quantity`}
+                        aria-label={`Disminuir cantidad de ${item.name}`}
                       >
                         <Minus className="w-3 h-3" />
                       </Button>
@@ -109,7 +109,7 @@ export function CartPanel() {
                       size="icon"
                       variant="ghost"
                       className="h-7 w-7 text-foreground hover:bg-secondary/50 rounded-md"
-                      aria-label={`Increase ${item.name} quantity`}
+                      aria-label={`Aumentar cantidad de ${item.name}`}
                     >
                       <Plus className="w-3 h-3" />
                     </Button>
@@ -122,7 +122,7 @@ export function CartPanel() {
                     size="icon"
                     variant="ghost"
                     className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0 rounded-lg"
-                    aria-label={`Remove ${item.name} from cart`}
+                    aria-label={`Eliminar ${item.name} del carrito`}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -142,8 +142,8 @@ export function CartPanel() {
               <span className="text-foreground font-medium tabular-nums">${subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Delivery</span>
-              <span className="text-green-400 font-medium">Free</span>
+              <span className="text-muted-foreground">Entrega</span>
+              <span className="text-green-400 font-medium">Gratis</span>
             </div>
             <div className="h-px bg-border/20 my-2" />
             <div className="flex justify-between items-baseline">
