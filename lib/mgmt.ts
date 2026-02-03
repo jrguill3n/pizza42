@@ -1,5 +1,3 @@
-import "server-only";
-
 const AUTH0_MGMT_DOMAIN = process.env.AUTH0_MGMT_DOMAIN!;
 const AUTH0_MGMT_CLIENT_ID = process.env.AUTH0_MGMT_CLIENT_ID!;
 const AUTH0_MGMT_CLIENT_SECRET = process.env.AUTH0_MGMT_CLIENT_SECRET!;

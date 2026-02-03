@@ -139,6 +139,19 @@ export const copy = {
     profile_auth_email: "Correo y contraseña",
     profile_auth_social: "Inicio de sesión social",
     
+    // Segmentación
+    segment_new_customer: "Nuevo Cliente",
+    segment_new_benefit: "10% de descuento en tu primer pedido",
+    segment_new_cta: "Obtener 10% de Descuento",
+    segment_returning: "Cliente Frecuente",
+    segment_returning_benefit: "Bebida gratis con tu próximo pedido",
+    segment_returning_cta: "Canjear Recompensa",
+    segment_power: "Power Customer (VIP)",
+    segment_power_benefit: "Entrega gratis + acceso anticipado a nuevos artículos del menú",
+    segment_power_cta: "Desbloquear Oferta VIP",
+    segment_tooltip_title: "¿Por qué veo esto?",
+    segment_tooltip_text: "Basado en tu historial de pedidos.",
+    
     // Order History States
     orders_loading: "Cargando pedidos...",
     orders_login_title: "Inicia sesión para ver tu historial",
@@ -155,19 +168,6 @@ export const copy = {
     orders_error_subtitle: "Ocurrió un error inesperado. Por favor intenta de nuevo.",
     orders_retry_cta: "Reintentar",
     orders_history_title: "Historial de pedidos",
-    
-    // Segmentación
-    segment_new_customer: "Nuevo Cliente",
-    segment_new_benefit: "10% de descuento en tu primer pedido",
-    segment_new_cta: "Obtener 10% de Descuento",
-    segment_returning: "Cliente Frecuente",
-    segment_returning_benefit: "Bebida gratis con tu próximo pedido",
-    segment_returning_cta: "Canjear Recompensa",
-    segment_power: "Power Customer (VIP)",
-    segment_power_benefit: "Entrega gratis + acceso anticipado a nuevos artículos del menú",
-    segment_power_cta: "Desbloquear Oferta VIP",
-    segment_tooltip_title: "¿Por qué veo esto?",
-    segment_tooltip_text: "Basado en tu historial de pedidos.",
   },
 };
 

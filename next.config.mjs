@@ -6,7 +6,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  serverExternalPackages: ['jose', '@auth0/nextjs-auth0'],
+ 
 }
 
 export default nextConfig

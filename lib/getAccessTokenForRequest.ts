@@ -1,6 +1,5 @@
-import "server-only";
 import { NextResponse } from "next/server";
-import { auth0 } from "@/lib/auth0.server";
+import { auth0 } from "@/lib/auth0";
 
 /**
  * Helper to get access token for the current session in an App Router route handler.

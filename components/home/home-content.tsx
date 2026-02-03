@@ -151,11 +151,7 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
   }
 
   const handleRepeatOrder = () => {
-    // Guard: Check if last order exists
-    if (!lastOrder?.items || lastOrder.items.length === 0) {
-      toast.error("Aún no tienes pedidos para reordenar");
-      return;
-    }
+    if (!lastOrder?.items) return;
     
     // Normalize last order items to canonical cart format
     const normalized = lastOrder.items
@@ -174,14 +170,13 @@ export function HomeContent({ user, ordersContext: initialOrdersContext }: HomeC
       })
       .filter((item): item is OrderItem => item !== null);
     
-    // Replace cart contents entirely (clear previous cart, then add all items)
+    // Replace cart contents entirely (reorder = repeat order)
     setCartItems(normalized);
     
     toast.success("Pedido agregado al carrito", {
       description: "Tu último pedido está listo para ordenar",
     });
-    
-    // Navigate to cart page so user can review items
+    // Navigate to order page so user can review and checkout
     router.push("/order");
   };
 

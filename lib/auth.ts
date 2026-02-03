@@ -1,4 +1,3 @@
-import "server-only";
 import * as jose from "jose";
 
 const AUTH0_ISSUER = process.env.AUTH0_ISSUER_BASE_URL!;
