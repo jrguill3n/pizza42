@@ -25,7 +25,8 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
   // Get Spanish display name, fallback to original
   const displayName = MENU_NAME_ES[item.id] ?? item.name;
 
-  const imageSrc = getProductImageSrc(item.sku || item.id);
+  // SKU-based image source with fallback
+  const imageSrc = item.sku ? `/images/${item.sku}.jpg` : `/images/placeholder.jpg`;
   const categoryLetter = getCategoryLetter(item.sku || item.id);
 
   const handleAdd = () => {
@@ -62,9 +63,12 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
               <Image
                 src={imageSrc}
                 alt={displayName}
-                fill
-                sizes="180px"
-                className="object-cover rounded-xl"
+                width={400}
+                height={400}
+                sizes="(max-width: 768px) 50vw, 25vw"
+                loading="lazy"
+                quality={75}
+                className="object-cover rounded-xl w-full h-full"
                 onError={() => setImageError(true)}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
@@ -133,9 +137,12 @@ export function MenuItemCard({ item, variant = "default" }: MenuItemCardProps) {
             <Image
               src={imageSrc}
               alt={displayName}
-              fill
-              sizes="48px"
-              className="object-cover rounded-lg"
+              width={400}
+              height={400}
+              sizes="(max-width: 768px) 50vw, 25vw"
+              loading="lazy"
+              quality={75}
+              className="object-cover rounded-lg w-full h-full"
               onError={() => setImageError(true)}
             />
           ) : (
