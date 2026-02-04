@@ -1,6 +1,6 @@
 "use client";
 
-import { Fingerprint, Info } from "lucide-react";
+import { Fingerprint } from "lucide-react";
 
 export function PasskeysRoadmapCallout() {
   return (
@@ -23,10 +23,7 @@ export function PasskeysRoadmapCallout() {
             Estrategia mobile-first con fallback a Google y email/password.
           </p>
 
-          <div className="flex items-center gap-2 text-xs text-muted-foreground/70 pt-2">
-            <Info className="w-3.5 h-3.5" />
-            <span>Informational only - no action required</span>
-          </div>
+
         </div>
       </div>
     </div>
