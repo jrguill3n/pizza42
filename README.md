@@ -46,6 +46,7 @@ https://v0-pizza42.vercel.app
 
 ## Authentication & Authorization Flow
 High-level flow for obtaining tokens and placing orders:
+```
 Browser
 ↓
 Next.js App Router (Client Components)
@@ -59,6 +60,7 @@ Auth0 SDK (Session)
 Auth0 Management API
 ↓
 Auth0 User Metadata (orders)
+```
 - Auth0 Universal Login handles authentication.
 - Access Tokens are used to call protected APIs.
 - ID Tokens contain custom claims for UI personalization.
