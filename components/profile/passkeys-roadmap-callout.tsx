@@ -12,15 +12,15 @@ export function PasskeysRoadmapCallout() {
 
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-semibold text-foreground">Future: Passkeys</h3>
+            <h3 className="text-lg font-semibold text-foreground">Futuro: Passkeys</h3>
             <div className="px-2 py-0.5 rounded-full bg-accent/20 text-accent text-xs font-medium">
               Roadmap
             </div>
           </div>
 
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Phishing resistant sign-in with biometrics. Recommended mobile first rollout with
-            fallback to Google and password.
+            Autenticación sin contraseña mediante biometría.
+            Estrategia mobile-first con fallback a Google y email/password.
           </p>
 
           <div className="flex items-center gap-2 text-xs text-muted-foreground/70 pt-2">
