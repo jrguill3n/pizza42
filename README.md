@@ -44,21 +44,28 @@ https://v0-pizza42.vercel.app
 
 ## 🧩 Architecture
 
-```
+## Authentication & Authorization Flow
+High-level flow for obtaining tokens and placing orders:
 Browser
-  ↓
+↓
 Next.js App Router (Client Components)
-  ↓
+↓
 Auth0 SDK (Session)
-  ↓
-/api/auth/token → Access Token
-  ↓
-/api/orders (Protected API)
-  ↓
+↓
+/api/auth/token → Access Token (JWT)
+↓
+/api/orders (Protected API + scopes)
+↓
 Auth0 Management API
-  ↓
-User Metadata
-```
+↓
+Auth0 User Metadata (orders)
+- Auth0 Universal Login handles authentication.
+- Access Tokens are used to call protected APIs.
+- ID Tokens contain custom claims for UI personalization.
+- Orders are stored in Auth0 user_metadata.
+
+### Detailed Architecture Diagram
+![Detailed Architecture](diagramageneral.png)
 
 **Separation of concerns:**
 
